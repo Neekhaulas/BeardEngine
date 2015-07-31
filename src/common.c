@@ -15,3 +15,13 @@ void Print(char* format, ...)
 
 	ConsolePrint(print);
 }
+
+char* CopyString(char* str)
+{
+	char* cpy;
+	cpy = malloc(strlen(str)+1);
+
+	strcpy(cpy, str);
+
+	return cpy;
+}

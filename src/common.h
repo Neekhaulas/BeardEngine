@@ -16,6 +16,7 @@ void Frame();
 void Shutdown();
 void Print(char* format, ...);
 void Print_Error(int type, char* format, ...);
+char* CopyString(char* str);
 
 /*
 CONSOLE

@@ -62,12 +62,13 @@ void Cvar_Set(char* var_name, char* var_value, int var_flag, char* var_desc)
 			return;
 		}
 
-		var->string = var_value;
+		var->string = CopyString(var_value);
 		var->value = atoi(var_value);
 		var->valuef = atof(var_value);
 		var->flags = var_flag;
 		var->modified = btrue;
 		var->countModified = 1;
+		return;
 	}
 
 	for (index = 0; index < MAX_CVARS; index++)
@@ -83,8 +84,8 @@ void Cvar_Set(char* var_name, char* var_value, int var_flag, char* var_desc)
 
 	var = &cvar_indexes[index];
 	var->name = var_name;
-	var->reset = var_value;
-	var->string = var_value;
+	var->reset = CopyString(var_value);
+	var->string = CopyString(var_value);
 	var->value = atoi(var_value);
 	var->valuef = atof(var_value);
 	var->flags = var_flag;
@@ -113,11 +114,11 @@ void Cvar_Print(char* var_name)
 	{
 		if (var->desc)
 		{
-			Print("\"%s\" : \"%s\" (%s)", var->name, var->string, var->desc);
+			Print("\"%s\" : \"%s\" (default : %s) (%s)", var->name, var->string, var->reset, var->desc);
 		}
 		else
 		{
-			Print("\"%s\" : \"%s\"", var->name, var->string);
+			Print("\"%s\" : \"%s\" (default : %s)", var->name, var->string, var->reset);
 		}
 	}
 	else
@@ -164,6 +165,7 @@ void Cvar_Reset(char* var_name)
 	Cvar* var;
 	
 	var = Cvar_Find(var_name);
+
 
 	if (var)
 	{

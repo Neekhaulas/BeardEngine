@@ -49,6 +49,11 @@ int main (int argc, char **argv)
   Cvar_Print("width_screen");
   Cvar_Print("height_screen");
 
+  Cvar_Set("width_screen", "800", CVAR_USER_CREATED, NULL);
+  Cvar_Print("width_screen");
+  Cvar_Reset("width_screen");
+  Cvar_Print("width_screen");
+
   Cvar_Set("g_developper", "0", 0, NULL);
   Cvar_Print("g_developper");
 
