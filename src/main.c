@@ -9,7 +9,7 @@
 #include <ctype.h>
 #include <errno.h>
 
-//#define DEDICATED
+#define DEDICATED
 
 #ifndef DEDICATED
 #include <SDL.h>
@@ -18,7 +18,7 @@
 #include "shared.h"
 #include "common.h"
 
-void ParseArgs( int argc, char **argv )
+void ParseArgs(int argc, char **argv)
 {
   if( argc == 2 )
   {
@@ -38,5 +38,23 @@ void ParseArgs( int argc, char **argv )
 int main (int argc, char **argv)
 {
   ParseArgs( argc, argv );
+  Cvar_Init();
+  Cvar_Set("g_developper", "1", CVAR_READ_ONLY, "If the developper mod is on");
+  Cvar_Set("net_master_server", "be.grandebar.be", CVAR_READ_ONLY, "Address of the master server");
+  Cvar_Set("width_screen", "1400", CVAR_USER_CREATED, NULL);
+  Cvar_Set("height_screen", "900", CVAR_USER_CREATED, NULL);
+  Cvar_Print("g_developper");
+  Cvar_Print("net_master_server");
+  Cvar_Print("hello_world");
+  Cvar_Print("width_screen");
+  Cvar_Print("height_screen");
+
+  Cvar_Set("g_developper", "0", 0, NULL);
+  Cvar_Print("g_developper");
+
+  while (1)
+  {
+
+  }
   return 0;
 }

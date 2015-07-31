@@ -2,10 +2,11 @@
 #ifndef __SHARED_H
 #define __SHARED_H
 
+
 #define PRODUCT_NAME "BeardEngine"
 #define VERSION "0.01"
 
-typedef enum { false, true } boolean;
+typedef enum { bfalse, btrue } boolean;
 
 /*
 ============= CVAR =================
@@ -21,12 +22,18 @@ typedef struct _Cvar Cvar;
 struct _Cvar
 {
 	char		*name;
-	char		*value;
+	char		*string;
+	char		*reset;
+	char		*desc;
+	int			value;
+	float		valuef;
 	int			countModified;
 	boolean		modified;
 	int			flags;
 
 	Cvar		*next;
+	Cvar		*prev;
+	int			hashIndex;
 };
 
 #endif
