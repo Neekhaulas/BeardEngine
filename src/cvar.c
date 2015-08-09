@@ -1,5 +1,5 @@
 
-#include "../src/common.h"
+#include "common.h"
 
 #define			MAX_CVARS	1024
 Cvar			cvar_indexes[MAX_CVARS];
@@ -46,7 +46,7 @@ Cvar* Cvar_Get(char* var_name)
 	return var;
 }
 
-void Cvar_Set(char* var_name, char* var_value, int var_flag, char* var_desc)
+Cvar* Cvar_Set(char* var_name, char* var_value, int var_flag, char* var_desc)
 {
 	Cvar* var;
 	int index;
@@ -59,7 +59,7 @@ void Cvar_Set(char* var_name, char* var_value, int var_flag, char* var_desc)
 		if (var->flags & CVAR_READ_ONLY)
 		{
 			Print("%s var is read only", var_name);
-			return;
+			return var;
 		}
 
 		var->string = CopyString(var_value);
@@ -68,7 +68,7 @@ void Cvar_Set(char* var_name, char* var_value, int var_flag, char* var_desc)
 		var->flags = var_flag;
 		var->modified = btrue;
 		var->countModified = 1;
-		return;
+		return var;
 	}
 
 	for (index = 0; index < MAX_CVARS; index++)
@@ -80,6 +80,7 @@ void Cvar_Set(char* var_name, char* var_value, int var_flag, char* var_desc)
 	if (index >= MAX_CVARS)
 	{
 		Print("Error: Too many cvars, cannot create a new one!");
+		return NULL;
 	}
 
 	var = &cvar_indexes[index];
@@ -102,28 +103,29 @@ void Cvar_Set(char* var_name, char* var_value, int var_flag, char* var_desc)
 
 	var->prev = NULL;
 	hashTable[hash] = var;
+
+	return var;
 }
 
-void Cvar_Print(char* var_name)
+void Cvar_Print(Cvar* var)
 {
-	Cvar* var;
-
-	var = Cvar_Find(var_name);
-
 	if (var)
 	{
-		if (var->desc)
+		if (var->flags & CVAR_READ_ONLY || var->flags & CVAR_PROTECTED)
 		{
-			Print("\"%s\" : \"%s\" (default : %s) (%s)", var->name, var->string, var->reset, var->desc);
+			Print("\"%s\" : \"%s\"", var->name, var->string);
 		}
 		else
 		{
-			Print("\"%s\" : \"%s\" (default : %s)", var->name, var->string, var->reset);
+			if (var->desc)
+			{
+				Print("\"%s\" : \"%s\" (default : %s) (%s)", var->name, var->string, var->reset, var->desc);
+			}
+			else
+			{
+				Print("\"%s\" : \"%s\" (default : %s)", var->name, var->string, var->reset);
+			}
 		}
-	}
-	else
-	{
-		Print("\"%s\" not found", var_name);
 	}
 }
 
@@ -187,8 +189,103 @@ void Cvar_Reset(char* var_name)
 	}
 }
 
+beboolean Cvar_Command()
+{
+	Cvar *cvar;
+
+	cvar = Cvar_Find(Command_Argv(0));
+	if (!cvar)
+	{
+		return bfalse;
+	}
+
+	if (Command_Argc() == 1)
+	{
+		Cvar_Print(cvar);
+		return btrue;
+	}
+
+	Cvar_Set(cvar->name, Command_Argv(1), 0, NULL);
+
+	return btrue;
+	//set
+}
+
+void Cvar_Print_f()
+{
+	Cvar *cvar;
+
+	if (Command_Argc() < 2)
+	{
+		Print("Usage : print <variable>");
+	}
+
+	cvar = Cvar_Find(Command_Argv(1));
+
+	if (cvar)
+		Cvar_Print(cvar);
+	else
+		Print("Cvar %s doesn't exist.", Command_Argv(1));
+}
+
+void Cvar_Set_f()
+{
+	Cvar *cvar;
+
+	if (Command_Argc() < 2)
+	{
+		Print("set <cvar> <value>");
+		return;
+	}
+
+	if (Command_Argc() == 2)
+	{
+		Cvar_Print_f();
+		return;
+	}
+
+	cvar = Cvar_Find(Command_Argv(1));
+	if (!cvar)
+	{
+		Cvar_Set(Command_Argv(1), Command_Argv(2), 0, NULL);
+		return;
+	}
+
+	Cvar_Set(cvar->name, Command_Argv(2), CVAR_USER_CREATED, NULL);
+}
+
+void Cvar_Reset_f()
+{
+	if (Command_Argc() < 2)
+	{
+		Print("Usage : reset <cvar>");
+	}	
+}
+
+void Cvar_List_f()
+{
+	int i = 0, c = 0;
+	Cvar *cvar;
+	for (i = 0; i < HASH_SIZE; i++)
+	{
+		if (hashTable[i])
+		{
+			for (cvar = hashTable[i]; cvar; cvar = cvar->next)
+			{
+				Print("%s", cvar->name);
+				c++;
+			}
+		}
+	}
+	Print("Total : %d cvars", c);
+}
+
 void Cvar_Init()
 {
 	memset(cvar_indexes, '\0', sizeof(cvar_indexes));
 	memset(hashTable, '\0', sizeof(hashTable));
+
+	Command_Add("set", Cvar_Set_f);
+	Command_Add("reset", Cvar_Reset_f);
+	Command_Add("cvarlist", Cvar_List_f);
 }

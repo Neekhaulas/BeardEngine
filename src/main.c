@@ -1,4 +1,4 @@
-#include <signal.h>
+﻿#include <signal.h>
 #include <stdlib.h>
 #include <limits.h>
 #include <sys/types.h>
@@ -9,14 +9,18 @@
 #include <ctype.h>
 #include <errno.h>
 
-#define DEDICATED
+#include "shared.h"
+#include "common.h"
 
 #ifndef DEDICATED
 #include <SDL.h>
+#else
+#include "server.h"
+#ifdef WIN32
+#include <windows.h>
+#endif
 #endif
 
-#include "shared.h"
-#include "common.h"
 
 void ParseArgs(int argc, char **argv)
 {
@@ -37,29 +41,25 @@ void ParseArgs(int argc, char **argv)
 
 int main (int argc, char **argv)
 {
-  ParseArgs( argc, argv );
-  Cvar_Init();
-  Cvar_Set("g_developper", "1", CVAR_READ_ONLY, "If the developper mod is on");
-  Cvar_Set("net_master_server", "be.grandebar.be", CVAR_READ_ONLY, "Address of the master server");
-  Cvar_Set("width_screen", "1400", CVAR_USER_CREATED, NULL);
-  Cvar_Set("height_screen", "900", CVAR_USER_CREATED, NULL);
-  Cvar_Print("g_developper");
-  Cvar_Print("net_master_server");
-  Cvar_Print("hello_world");
-  Cvar_Print("width_screen");
-  Cvar_Print("height_screen");
+	ParseArgs( argc, argv );
+	Init(NULL);
+	Cvar_Set("s_masterserver", "be.grandebar.be", CVAR_READ_ONLY, "Address of the master server");
+	Cvar_Set("width_screen", "1400", CVAR_USER_CREATED, NULL);
+	Cvar_Set("height_screen", "900", CVAR_USER_CREATED, NULL);
 
-  Cvar_Set("width_screen", "800", CVAR_USER_CREATED, NULL);
-  Cvar_Print("width_screen");
-  Cvar_Reset("width_screen");
-  Cvar_Print("width_screen");
+	Cvar_Set("width_screen", "800", CVAR_USER_CREATED, NULL);
+	Cvar_Reset("width_screen");
 
-  Cvar_Set("g_developper", "0", 0, NULL);
-  Cvar_Print("g_developper");
+	while (1)
+	{
+#ifndef DEDICATED
+		Input_Frame();
+		//Console_Frame();
+#else
+		Console_Frame();
+#endif
+		Game_Frame();
+	}
 
-  while (1)
-  {
-
-  }
-  return 0;
+	return 0;
 }

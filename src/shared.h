@@ -2,14 +2,34 @@
 #ifndef __SHARED_H
 #define __SHARED_H
 
+//#define DEDICATED
+
+#ifndef DEDICATED
+#include <SDL.h>
+#endif
 
 #define PRODUCT_NAME "BeardEngine"
 #define VERSION "0.01"
 
-typedef enum { bfalse, btrue } boolean;
+#define MASTERSERVER "be.grandebar.be"
+
+#define CLIENT_WINDOW_TITLE "BeardEngine Protoype"
+
+typedef enum { bfalse, btrue } beboolean;
+
+/*
+============= VECTOR ===============
+*/
+
+typedef float vec;
+typedef vec vec2[2];
 
 /*
 ============= CVAR =================
+g - For game variable
+c - For client variable
+s - For server variable
+d - For debug purpose
 */
 
 #define CVAR_READ_ONLY 0x00001
@@ -28,12 +48,59 @@ struct _Cvar
 	int			value;
 	float		valuef;
 	int			countModified;
-	boolean		modified;
+	beboolean	modified;
 	int			flags;
 
 	Cvar		*next;
 	Cvar		*prev;
 	int			hashIndex;
 };
+
+/*
+============== ENTITY =============
+*/
+
+typedef struct _entityState entityState;
+
+typedef enum {
+	ET_GENERAL,
+	ET_PLAYER,
+	ET_ITEM,
+	ET_PROJECTILE,
+	ET_BEAM
+} entityType;
+
+struct _entityState
+{
+	int id;
+	int entityType;
+
+	vec2 pos;
+	
+	vec2 origin;
+	vec2 origin2;
+};
+
+/*
+============== SNAPCHOT ===========
+*/
+
+#define MAX_ENTITIES_PER_SNAPSHOT 64
+
+typedef struct {
+	int ping;
+
+	int serverTime;
+
+	int numEntities;
+	entityState entities[MAX_ENTITIES_PER_SNAPSHOT];
+} snapshot;
+
+
+/*
+============= COMMAND ==============
+*/
+
+typedef struct _command command;
 
 #endif
