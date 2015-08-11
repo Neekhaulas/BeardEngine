@@ -29,6 +29,20 @@ void Print(char* format, ...)
 	Console_Print(print);
 }
 
+char* Format(char *format, ...)
+{
+	char print[1024];
+	va_list arglist;
+
+	va_start(arglist, format);
+
+	vsprintf(print, format, arglist);
+
+	va_end(arglist);
+
+	return print;
+}
+
 char* CopyString(const char* str)
 {
 	char* cpy;
@@ -84,6 +98,8 @@ void Init(char* command)
 #else
 	Console_Init();
 #endif
+
+	Network_Init();
 
 	Command_Add("quit", Quit);
 }

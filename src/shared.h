@@ -2,16 +2,24 @@
 #ifndef __SHARED_H
 #define __SHARED_H
 
-//#define DEDICATED
+#define DEDICATED
 
 #ifndef DEDICATED
 #include <SDL.h>
+#endif
+
+#ifndef __GNUC__
+#ifndef __attribute__
+#define __attribute__(x)
+#endif
 #endif
 
 #define PRODUCT_NAME "BeardEngine"
 #define VERSION "0.01"
 
 #define MASTERSERVER "be.grandebar.be"
+
+#define PORT_SERVER 21430
 
 #define CLIENT_WINDOW_TITLE "BeardEngine Protoype"
 
@@ -32,10 +40,11 @@ s - For server variable
 d - For debug purpose
 */
 
-#define CVAR_READ_ONLY 0x00001
-#define CVAR_USER_CREATED 0x00002
-#define CVAR_CHEATS 0x00004
-#define CVAR_PROTECTED 0x00008
+#define CVAR_READ_ONLY		0x00001
+#define CVAR_USER_CREATED	0x00002
+#define CVAR_CHEATS			0x00004
+#define CVAR_PROTECTED		0x00008
+#define CVAR_LOCKED			0x00010
 
 typedef struct _Cvar Cvar;
 

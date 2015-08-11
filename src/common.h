@@ -20,6 +20,7 @@ char* CopyString(const char* str);
 void Game_Frame();
 void Input_Frame();
 void Quit();
+char* Format(char *format, ...);
 
 /*
 CONSOLE
@@ -42,6 +43,7 @@ Cvar* Cvar_Get(char* var_name);
 //Get Cvar with the name
 
 Cvar* Cvar_Set(char* var_name, char* var_value, int var_flag, char* var_desc);
+Cvar* Cvar_Set2(char* var_name, char* var_value, int var_flag);
 //Set Cvar with name, value in string, flag and description
 
 void Cvar_Print(Cvar* var);
@@ -77,7 +79,21 @@ int Command_Argc();
 void Command_Parse(const char* cmd);
 
 /*
+FILE
+*/
+
+char* File_Read(char *name);
+
+/*
 EVENT
 */
+
+/*
+NETWORK
+*/
+
+void Network_OpenIP();
+void Network_Config(beboolean enableNetworking);
+void Network_Init();
 
 #endif

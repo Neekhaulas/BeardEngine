@@ -62,6 +62,12 @@ Cvar* Cvar_Set(char* var_name, char* var_value, int var_flag, char* var_desc)
 			return var;
 		}
 
+		if (var->flags & CVAR_LOCKED && !(var_flag & CVAR_LOCKED))
+		{
+			Print("%s var is locked", var_name);
+			return var;
+		}
+
 		var->string = CopyString(var_value);
 		var->value = atoi(var_value);
 		var->valuef = atof(var_value);
@@ -105,6 +111,11 @@ Cvar* Cvar_Set(char* var_name, char* var_value, int var_flag, char* var_desc)
 	hashTable[hash] = var;
 
 	return var;
+}
+
+Cvar* Cvar_Set2(char* var_name, char* var_value, int var_flag)
+{
+	return Cvar_Set(var_name, var_value, var_flag, NULL);
 }
 
 void Cvar_Print(Cvar* var)
@@ -288,4 +299,5 @@ void Cvar_Init()
 	Command_Add("set", Cvar_Set_f);
 	Command_Add("reset", Cvar_Reset_f);
 	Command_Add("cvarlist", Cvar_List_f);
+	Command_Add("print", Cvar_Print_f);
 }
