@@ -43,18 +43,10 @@ int main (int argc, char **argv)
 {
 	ParseArgs( argc, argv );
 	Init(NULL);
-	Cvar_Set("s_masterserver", "be.grandebar.be", CVAR_READ_ONLY, "Address of the master server");
-	Cvar_Set("width_screen", "1400", CVAR_USER_CREATED, NULL);
-	Cvar_Set("height_screen", "900", CVAR_USER_CREATED, NULL);
-
-	Cvar_Set("width_screen", "800", CVAR_USER_CREATED, NULL);
-	Cvar_Reset("width_screen");
-
 	while (1)
 	{
 #ifndef DEDICATED
 		Input_Frame();
-		//Console_Frame();
 #else
 		Console_Frame();
 #endif

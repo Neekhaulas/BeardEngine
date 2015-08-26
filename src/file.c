@@ -10,7 +10,7 @@ char* File_Read(char *name, char* _buffer)
 	file = fopen(name, "r");
 	if (!file)
 	{
-		fprintf(stderr, "Unable to open file %s", name);
+		Print("Unable to open file %s", name);
 		return NULL;
 	}
 
@@ -23,7 +23,7 @@ char* File_Read(char *name, char* _buffer)
 	buffer = (char *)malloc(fileLen + 1);
 	if (!buffer)
 	{
-		fprintf(stderr, "Memory error!");
+		Print("Memory error!");
 		fclose(file);
 		return NULL;
 	}	

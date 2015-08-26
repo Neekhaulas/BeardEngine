@@ -1,5 +1,6 @@
 #include "client.h"
 #include "client_input.h"
+#include "common.h"
 
 #ifndef DEDICATED
 
@@ -22,6 +23,8 @@ void Client_Init()
 	}
 
 	Client_Init_Input();
+
+	Command_Exec("exec client.cfg");
 }
 
 void Input_Frame()

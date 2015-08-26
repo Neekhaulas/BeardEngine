@@ -15,6 +15,8 @@ void Client_Init_Input()
 	AddCommand("-down", Input_Down_Up);*/
 
 	Command_Add("bind", Keys_Bind_f);
+	Command_Add("unbindall", Keys_Unbindall_f);
+	Command_Add("bindlist", Keys_Bindlist_f);
 }
 
 void Client_Process_Events()
@@ -27,9 +29,11 @@ void Client_Process_Events()
 		switch (e.type)
 		{
 		case SDL_KEYDOWN:
-			Print("Scancode: 0x%02x(%s) Sym: 0x%02x(%s)",
-				e.key.keysym.scancode, SDL_GetScancodeName(e.key.keysym.scancode),
-				e.key.keysym.sym, SDL_GetKeyName(e.key.keysym.sym));
+			Event_Queue(EVT_KEY, (int)e.key.keysym.sym, 1);	
+			break;
+
+		case SDL_KEYUP:
+			Event_Queue(EVT_KEY, (int)e.key.keysym.sym, 0);
 			break;
 
 		case SDL_QUIT:
