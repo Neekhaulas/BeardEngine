@@ -19,7 +19,5 @@ typedef struct _key
 
 int Keys_StringToKeyNum(char *str);
 void Keys_Bind_f();
-void Keys_Unbindall_f();
-void Keys_Bindlist_f();
 
 #endif

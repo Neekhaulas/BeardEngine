@@ -123,47 +123,6 @@ void Command_Exec(const char* text)
 	return;
 }
 
-void Command_Exec_f()
-{
-	char* cmd_exec;
-	int i = 0;
-
-	if (Command_Argc() < 2)
-	{
-		Print("Usage : exec <file>");
-		return;
-	}
-	
-	char* read = File_Read(Command_Argv(1));
-
-	if (read == NULL)
-	{
-		return;
-	}
-
-	cmd_exec = malloc(sizeof(char) * 256);
-
-	if (read)
-	{
-		while (*read != '\0')
-		{
-			if (*read == ';' || *read == '\n')
-			{
-				cmd_exec[i] = '\0';
-				Command_Exec(cmd_exec);
-				i = 0;
-			}
-			else
-			{
-				if (i < 256)
-					cmd_exec[i] = *read;
-				i++;
-			}
-			*read++;
-		}
-	}
-}
-
 void Command_List_f()
 {
 	command* cmd;
@@ -180,6 +139,5 @@ void Command_Init()
 {
 	Print("Initiliazing commands");
 	Command_Add("cmdlist", Command_List_f);
-	Command_Add("exec", Command_Exec_f);
 	Print("Commands initialized");
 }

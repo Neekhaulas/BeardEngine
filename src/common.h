@@ -88,19 +88,6 @@ char* File_Read(char *name);
 EVENT
 */
 
-#define MAX_EVENTS 256
-
-typedef enum
-{
-	EVT_KEY,
-	EVT_CHAT,
-	EVT_MOUSE,
-	EVT_JOYSTICK
-} eventType;
-
-void Event_Queue(eventType type, int value1, int value2);
-void Event_Loop();
-
 /*
 NETWORK
 */

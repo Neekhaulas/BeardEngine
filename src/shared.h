@@ -2,7 +2,7 @@
 #ifndef __SHARED_H
 #define __SHARED_H
 
-//#define DEDICATED
+#define DEDICATED
 
 #ifndef DEDICATED
 #include <SDL.h>

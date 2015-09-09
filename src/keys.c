@@ -30,25 +30,3 @@ void Keys_Bind_f()
 
 	keys[key].binding = Command_Argv(2);
 }
-
-void Keys_Unbindall_f()
-{
-	for (int i = 0; i < MAX_KEYS; i++)
-	{
-		if (keys[i].binding)
-		{
-			keys[i].binding = NULL;
-		}
-	}
-}
-
-void Keys_Bindlist_f()
-{
-	for (int i = 0; i < MAX_KEYS; i++)
-	{
-		if (keys[i].binding)
-		{
-			Print("%c : %s", i, keys[i].binding);
-		}
-	}
-}

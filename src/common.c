@@ -94,16 +94,17 @@ void Init(char* command)
 
 #ifndef DEDICATED
 	Client_Init();
+	Console_Init();
 #else
 	Console_Init();
 #endif
 
-	//Network_Init();
+	Network_Init();
 
 	Command_Add("quit", Quit);
 }
 
 void Game_Frame()
 {
-	Event_Loop();
+
 }
