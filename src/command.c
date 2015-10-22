@@ -1,4 +1,6 @@
-#include "common.h"
+#include "common.h" 
+#include <string.h>
+#include <stdio.h>
 
 #define MAX_ARGS 10
 
@@ -18,14 +20,56 @@ void Command_Parse(const char* cmd)
 {
 	argc = 0;
 
-	char * pch;
-	pch = strtok(CopyString(cmd), " ");
-	while (pch != NULL)
+	int size, i;
+	char line[1024];
+	char *cmd_str = CopyString(cmd);
+	char *str;
+	beboolean inQuote;
+
+	size = strlen(cmd_str);
+	inQuote = bfalse;
+
+	while (size)
 	{
+		str = cmd_str;
+		for (i = 0; i < size; i++)
+		{
+			if (*(cmd_str + i) == ' ' && !inQuote)
+			{
+				break;
+			}
+
+			if (*(cmd_str + i) == '"')
+			{
+				if (!inQuote)
+				{
+					inQuote = btrue;
+					i++;
+					size -= i;
+					memmove(str, str + i, size);
+				}
+				else
+				{
+					inQuote = bfalse;
+					break;
+				}
+			}
+		}
+
+		memcpy(line, str, i);
+		line[i] = 0;
+		argv[argc++] = CopyString(line);
 		if (argc == MAX_ARGS)
-			return;
-		argv[argc++] = pch;
-		pch = strtok(NULL, " ");
+			break;
+
+		if (i == size)
+			size = 0;
+		else
+		{
+			i++;
+			size -= i;
+			memmove(str, str + i, size);
+		}
 	}
 }
 
@@ -57,7 +101,7 @@ void Command_Add(const char* command_name, void* function)
 	cmd->command_text = CopyString(command_name);
 	cmd->function = function;
 	cmd->next = commands;
-	
+
 	commands = cmd;
 }
 
@@ -135,9 +179,67 @@ void Command_List_f()
 	}
 }
 
+void Command_Exec_f()
+{
+	if (Command_Argc() == 2)
+	{
+		file_t *file = File_Read(Command_Argv(1));
+		if (file)
+		{
+			int i;
+			char line[1024];
+			char *str;
+			while (file->current_size)
+			{
+				str = file->data;
+
+				for (i = 0; i < file->current_size; i++)
+				{
+					if (*(str + i) == '\n')
+					{
+						break;
+					}
+				}
+
+				memcpy(line, str, i);
+				line[i] = 0;
+				Command_Exec(line);
+
+				if (i == file->current_size)
+					file->current_size = 0;
+				else
+				{
+					i++;
+					file->current_size -= i;
+					memmove(str, str + i, file->current_size);
+				}
+			}
+		}
+	}
+	else
+	{
+		Print("usage : exec <file>");
+	}
+}
+
+
+void Echo_f()
+{
+	if (Command_Argc() == 2)
+	{
+		Print(Command_Argv(1));
+	}
+	else
+	{
+		Print("usage: echo <text>");
+	}
+}
+
 void Command_Init()
 {
 	Print("Initiliazing commands");
 	Command_Add("cmdlist", Command_List_f);
+	Command_Add("exec", Command_Exec_f);
+	Command_Add("echo", Echo_f);
 	Print("Commands initialized");
 }

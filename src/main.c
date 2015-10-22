@@ -12,13 +12,9 @@
 #include "shared.h"
 #include "common.h"
 
-#ifndef DEDICATED
 #include <SDL.h>
-#else
-#include "server.h"
 #ifdef WIN32
 #include <windows.h>
-#endif
 #endif
 
 
@@ -39,26 +35,41 @@ void ParseArgs(int argc, char **argv)
   }
 }
 
+void handle_input()
+{
+	SDL_Event e;
+
+	while (SDL_PollEvent(&e))
+	{
+		switch (e.type)
+		{
+		case SDL_KEYDOWN:
+			Event_Queue(EVENT_KEY, e.key.keysym.sym, 1);
+			break;
+
+		case SDL_KEYUP:
+			Event_Queue(EVENT_KEY, e.key.keysym.sym, 0);
+			break;
+
+		case SDL_QUIT:
+			Command_Exec("quit");
+			break;
+		}
+	}
+}
+
 int main (int argc, char **argv)
 {
 	ParseArgs( argc, argv );
-	Init(NULL);
-	Cvar_Set("s_masterserver", "be.grandebar.be", CVAR_READ_ONLY, "Address of the master server");
+	if (Init(NULL) != 0)
+		return 1;
 	Cvar_Set("width_screen", "1400", CVAR_USER_CREATED, NULL);
 	Cvar_Set("height_screen", "900", CVAR_USER_CREATED, NULL);
 
-	Cvar_Set("width_screen", "800", CVAR_USER_CREATED, NULL);
-	Cvar_Reset("width_screen");
-
-	while (1)
+	for (;;)
 	{
-#ifndef DEDICATED
-		Input_Frame();
-		//Console_Frame();
-#else
-		Console_Frame();
-#endif
-		Game_Frame();
+		handle_input();
+		Game_Update_World();
 	}
 
 	return 0;

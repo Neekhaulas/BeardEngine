@@ -6,12 +6,30 @@
 #include <string.h>
 #include <stdlib.h>
 #include "shared.h"
+#include <enet/enet.h>
+
+#ifndef SERVER
+#include <SDL.h>
+#endif
+
+/*
+CVARS
+*/
+
+Cvar* dedicated;
+Cvar* version;
+Cvar* developper;
+Cvar* error_reporting;
+
+Cvar* s_masterserver;
+
+Cvar* g_gravity;
 
 /*
 MAIN
 */
 
-void Init(char* command);
+int Init(char* command);
 void Frame();
 void Shutdown();
 void Print(char* format, ...);
@@ -32,9 +50,7 @@ void Console_Print(char* msg);
 void Console_Init();
 void Console_Frame();
 
-/*
-CVAR
-*/
+/*CVAR*/
 
 void Cvar_Init(void);
 //Initialize cvar system
@@ -64,9 +80,7 @@ void Cvar_Reset(char* var_name);
 beboolean Cvar_Command();
 //if the last command is a Cvar
 
-/*
-COMMAND
-*/
+/*COMMAND*/
 
 typedef void(*callback) (void);
 
@@ -78,22 +92,52 @@ char* Command_Argv(int index);
 int Command_Argc();
 void Command_Parse(const char* cmd);
 
-/*
-FILE
-*/
+/*FILE*/
 
-char* File_Read(char *name);
+typedef struct
+{
+	char* data;
+	int max_size;
+	int current_size;
+} file_t;
 
-/*
-EVENT
-*/
+file_t* File_Read(char *name);
 
-/*
-NETWORK
-*/
+/*EVENT*/
+
+void Event_Queue(int event_type, int value1, int value2);
+void Event_Loop();
+event Event_Get();
+
+/*NETWORK*/
 
 void Network_OpenIP();
 void Network_Config(beboolean enableNetworking);
-void Network_Init();
+int Network_Init();
+
+/*CLIENT*/
+
+void Client_KeyEvent(int key, beboolean down);
+void Client_Init();
+void Client_Process_Events();
+void Client_Connect();
+void Client_Connect_f();
+void Client_S2C();
+void Client_Send_Infos();
+void Client_Cleanup();
+
+/*GAME*/
+
+void Game_Update_World();
+void Game_Reset_Map();
+void Game_Change_Map();
+void Game_Set_Map();
+
+/*SERVER*/
+
+beboolean Server_Init(int argc, char** argv);
+void Server_Cleanup(void);
+void Server_Frame();
+void Server_Send_Game_State();
 
 #endif

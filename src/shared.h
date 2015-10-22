@@ -2,12 +2,6 @@
 #ifndef __SHARED_H
 #define __SHARED_H
 
-#define DEDICATED
-
-#ifndef DEDICATED
-#include <SDL.h>
-#endif
-
 #ifndef __GNUC__
 #ifndef __attribute__
 #define __attribute__(x)
@@ -18,10 +12,11 @@
 #define VERSION "0.01"
 
 #define MASTERSERVER "be.grandebar.be"
-
-#define PORT_SERVER 21430
+#define PORT_SERVER_DEFAULT 21430
 
 #define CLIENT_WINDOW_TITLE "BeardEngine Protoype"
+
+#define MAX_EVENTS_QUEUED 256
 
 typedef enum { bfalse, btrue } beboolean;
 
@@ -71,7 +66,8 @@ struct _Cvar
 
 typedef struct _entityState entityState;
 
-typedef enum {
+typedef enum
+{
 	ET_GENERAL,
 	ET_PLAYER,
 	ET_ITEM,
@@ -91,7 +87,7 @@ struct _entityState
 };
 
 /*
-============== SNAPCHOT ===========
+============== SNAPSHOT ===========
 */
 
 #define MAX_ENTITIES_PER_SNAPSHOT 64
@@ -111,5 +107,24 @@ typedef struct {
 */
 
 typedef struct _command command;
+
+/*
+============= EVENT ================
+*/
+
+typedef enum
+{
+	EVENT_KEY = 0,
+	EVENT_MOUSE,
+	EVENT_CHAR,
+	EVENT_JOYSTICK,
+	EVENT_NULL
+} eventType;
+
+typedef struct 
+{
+	eventType event_type;
+	int value1, value2;
+} event;
 
 #endif

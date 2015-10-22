@@ -1,38 +1,42 @@
 #include "common.h"
+#include <stdlib.h>
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <io.h>
 
-char* File_Read(char *name, char* _buffer)
+file_t* File_Read(char *name)
 {
-	FILE *file;
+	file_t* f;
 	char *buffer;
-	unsigned long fileLen;
+	FILE *file;
+	int size, read_size;
 
-	//Open file
-	file = fopen(name, "r");
+	file = fopen(name, "rb");
 	if (!file)
 	{
-		fprintf(stderr, "Unable to open file %s", name);
+		Print_Error(0, "Cannont open file %s", name);
 		return NULL;
 	}
-
-	//Get file length
 	fseek(file, 0, SEEK_END);
-	fileLen = ftell(file);
+	size = ftell(file);
 	rewind(file);
 
-	//Allocate memory
-	buffer = (char *)malloc(fileLen + 1);
-	if (!buffer)
+	buffer = malloc(sizeof(char) * (size + 1));
+	read_size = fread(buffer, sizeof(char), size, file);
+	buffer[size] = '\0';
+
+	if (size != read_size)
 	{
-		fprintf(stderr, "Memory error!");
-		fclose(file);
-		return NULL;
-	}	
+		free(buffer);
+		buffer = NULL;
+		Print_Error(1, "Error while reading file");
+	}
 
-	//Read file contents into buffer
-	fread(buffer, fileLen, 1, file);
-	buffer[fileLen - 3] = '\0';
 	fclose(file);
-
-	//Do what ever with buffer
-	return buffer;
+	f = malloc(sizeof(file_t));
+	f->data = buffer;
+	f->max_size = 128*1024;
+	f->current_size = size;
+	return f;
 }
