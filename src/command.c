@@ -87,7 +87,7 @@ char* Command_Argv(int index)
 	return argv[index];
 }
 
-void Command_Add(const char* command_name, void* function)
+void Command_Add(const char* command_name, callback function)
 {
 	command* cmd;
 
@@ -97,7 +97,7 @@ void Command_Add(const char* command_name, void* function)
 		return;
 	}
 
-	cmd = malloc(sizeof(command));
+	cmd = new command;
 	cmd->command_text = CopyString(command_name);
 	cmd->function = function;
 	cmd->next = commands;
@@ -235,11 +235,26 @@ void Echo_f()
 	}
 }
 
+void Map_f()
+{
+	if (Command_Argc() == 2)
+	{
+#ifndef SERVER
+		Game_Load_Map(Command_Argv(1));
+#endif
+	}
+	else
+	{
+		Print("usage: map <name>");
+	}
+}
+
 void Command_Init()
 {
 	Print("Initiliazing commands");
 	Command_Add("cmdlist", Command_List_f);
 	Command_Add("exec", Command_Exec_f);
 	Command_Add("echo", Echo_f);
+	Command_Add("map", Map_f);
 	Print("Commands initialized");
 }

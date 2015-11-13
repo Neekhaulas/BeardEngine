@@ -22,7 +22,7 @@ file_t* File_Read(char *name)
 	size = ftell(file);
 	rewind(file);
 
-	buffer = malloc(sizeof(char) * (size + 1));
+	buffer = (char*)malloc(sizeof(char) * (size + 1));
 	read_size = fread(buffer, sizeof(char), size, file);
 	buffer[size] = '\0';
 
@@ -34,7 +34,7 @@ file_t* File_Read(char *name)
 	}
 
 	fclose(file);
-	f = malloc(sizeof(file_t));
+	f = (file_t*)malloc(sizeof(file_t));
 	f->data = buffer;
 	f->max_size = 128*1024;
 	f->current_size = size;

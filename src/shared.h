@@ -8,8 +8,18 @@
 #endif
 #endif
 
+typedef char int8;
+typedef short int16;
+typedef int int32;
+typedef long long int64;
+typedef unsigned char uint8;
+typedef unsigned short uint16;
+typedef unsigned int uint32;
+typedef unsigned long long uint64;
+
 #define PRODUCT_NAME "BeardEngine"
 #define VERSION "0.01"
+#define ERROR_LEVEL 1
 
 #define MASTERSERVER "be.grandebar.be"
 #define PORT_SERVER_DEFAULT 21430
@@ -17,15 +27,17 @@
 #define CLIENT_WINDOW_TITLE "BeardEngine Protoype"
 
 #define MAX_EVENTS_QUEUED 256
+#define PLAYER_PER_TEAM 1
+
 
 typedef enum { bfalse, btrue } beboolean;
 
 /*
 ============= VECTOR ===============
 */
+typedef struct _vec vec;
 
-typedef float vec;
-typedef vec vec2[2];
+struct _vec { float x, y, z; };
 
 /*
 ============= CVAR =================
@@ -64,8 +76,6 @@ struct _Cvar
 ============== ENTITY =============
 */
 
-typedef struct _entityState entityState;
-
 typedef enum
 {
 	ET_GENERAL,
@@ -74,33 +84,6 @@ typedef enum
 	ET_PROJECTILE,
 	ET_BEAM
 } entityType;
-
-struct _entityState
-{
-	int id;
-	int entityType;
-
-	vec2 pos;
-	
-	vec2 origin;
-	vec2 origin2;
-};
-
-/*
-============== SNAPSHOT ===========
-*/
-
-#define MAX_ENTITIES_PER_SNAPSHOT 64
-
-typedef struct {
-	int ping;
-
-	int serverTime;
-
-	int numEntities;
-	entityState entities[MAX_ENTITIES_PER_SNAPSHOT];
-} snapshot;
-
 
 /*
 ============= COMMAND ==============
@@ -126,5 +109,37 @@ typedef struct
 	eventType event_type;
 	int value1, value2;
 } event;
+
+/*
+============= ENTITY ================
+*/
+
+class entity
+{
+public:
+	int id;
+	vec position;
+};
+
+class static_entity : public entity
+{
+	vec size;
+	int rotation;
+};
+
+class dynamic_entity : public entity
+{
+public:
+	vec velocity;
+};
+
+/*
+============= OPCODES =================
+*/
+
+enum PacketCmd {
+	C2S_COMMAND = 1,
+
+};
 
 #endif

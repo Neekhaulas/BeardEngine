@@ -1,8 +1,18 @@
 #include "common.h"
 
-ENetHost *serverHost = NULL;
-
 #ifdef SERVER
+#include <vector>
+#include "packets.h"
+
+ENetHost *serverHost = NULL;
+Client* clients[PLAYER_PER_TEAM*2];
+int countClients = 0;
+
+Cvar* dedicated;
+Cvar* version;
+Cvar* developper;
+Cvar* s_masterserver;
+Cvar* g_gravity;
 
 void fatal_error(char* error)
 {
@@ -14,6 +24,50 @@ void fatal_error(char* error)
 void Server_Send_Game_State()
 {
 
+}
+
+Client* add_client()
+{
+	Client* c = NULL;
+	for (int i = 0; i < PLAYER_PER_TEAM * 2; i++)
+	{
+		if (clients[i] == NULL)
+		{
+			c = new Client;
+			c->clientNumber = i;
+			clients[i] = c;
+			return c;
+		}
+	}
+	return NULL;
+}
+
+void Server_Disconnect_Player(int clientNumber, int reason)
+{
+	Client c = *clients[clientNumber];
+	enet_peer_disconnect(c.peer, reason);
+}
+
+void Server_Send_To(ENetPeer* peer, const uint8 *source, uint32 length, uint8 channelNo, uint32 flag)
+{
+	uint8* data = new uint8[length];
+	memcpy(data, source, length);
+
+	ENetPacket *packet = enet_packet_create(data, length, flag);
+	if (enet_peer_send(peer, channelNo, packet) < 0)
+	{
+		delete[] data;
+		Print_Error(1, "[NETWORK]Error while sending packet");
+	}
+
+	delete[] data;
+}
+
+void Server_Send_Infos(int clientNumber)
+{
+	PacketHeader packet(1);
+	Server_Send_To(clients[clientNumber]->peer, reinterpret_cast<uint8 *>(&packet), sizeof(packet), CHL_S2C, ENET_PACKET_FLAG_RELIABLE);
+	Print("Send infos");
 }
 
 void Server_Frame()
@@ -33,16 +87,27 @@ void Server_Frame()
 			case ENET_EVENT_TYPE_CONNECT:
 			{
 				Print("Event : connect");
+				Client* c = add_client();
+				if (c == NULL)
+				{
+					Print("Can't accept anymore connection");
+					enet_peer_disconnect(event.peer, DISCONNECT_MAXCLIENTS);
+					break;
+				}
+				c->peer = event.peer;
+				Server_Send_Infos(c->clientNumber);
 				break;
 			}
 
 			case ENET_EVENT_TYPE_RECEIVE:
 			{
+				Print("Event : packet");
 				break;
 			}
 
 			case ENET_EVENT_TYPE_DISCONNECT:
 			{
+				Print("Event : disconnect");
 				break;
 			}
 
@@ -59,7 +124,7 @@ beboolean Server_Init(int argc, char** argv)
 	Parser les arguments
 	*/
 	char* date = __DATE__;
-	char* version_str = malloc(strlen(PRODUCT_NAME " client " VERSION " (%s)") + 1);
+	char* version_str = (char*)malloc(strlen(PRODUCT_NAME " client " VERSION " (%s)") + 1);
 	
 	dedicated = Cvar_Set("dedicated", "1", CVAR_READ_ONLY, "If this is dedicated server");
 	sprintf(version_str, PRODUCT_NAME " dedicated server " VERSION " (%s)", date);
@@ -68,13 +133,12 @@ beboolean Server_Init(int argc, char** argv)
 	developper = Cvar_Set("developer", "1", CVAR_READ_ONLY, "If the developper mod is on");
 	s_masterserver = Cvar_Set("s_masterserver", MASTERSERVER, CVAR_READ_ONLY, "Address of the master server");
 	g_gravity = Cvar_Set("g_gravity", "800", CVAR_CHEATS, "Gravity of the game");
-	error_reporting = Cvar_Set("error_reporting", "4", CVAR_READ_ONLY, "Level of error");
 
 	ENetAddress address;
 	address.host = ENET_HOST_ANY;
 	address.port = PORT_SERVER_DEFAULT;
 
-	serverHost = enet_host_create(&address, 6, 3, 0, 0);
+	serverHost = enet_host_create(&address, PLAYER_PER_TEAM*2, 3, 0, 0);
 	if (!serverHost)
 	{
 		fatal_error("cannot start the server");

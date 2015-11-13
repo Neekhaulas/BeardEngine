@@ -1,32 +1,19 @@
 #include "common.h"
 #include "client.h"
 #include "client_input.h"
+#include "packets.h"
 
 #ifndef DEDICATED
-
-static SDL_Window *window = NULL;
 
 ENetHost *hostClient = NULL;
 ENetPeer *peerClient = NULL;
 int connectionAttemps = 0;
-int timeoutTimer = 0;
+unsigned int timeoutTimer = 0;
+beboolean connecting = bfalse, connected = bfalse;
+
 
 void Client_Init()
 {
-	Print("Window initializing");
-	if (SDL_Init(SDL_INIT_VIDEO) < 0)
-	{
-		Print_Error(1, "Can't initialize SDL Video");
-		exit(1);
-	}
-
-	window = SDL_CreateWindow(CLIENT_WINDOW_TITLE, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, SDL_WINDOW_SHOWN);
-	if (!window)
-	{
-		Print_Error(1, "Can't create SDL window");
-		exit(1);
-	}
-
 	if (enet_initialize() != 0)
 	{
 		Print_Error(1, "Cannot start enet");
@@ -39,6 +26,7 @@ void Client_Init()
 	atexit(enet_deinitialize);
 
 	Client_Init_Input();
+	Print("client initialized");
 }
 
 void Client_Connect(const char* serverAddress, int port)
@@ -62,6 +50,9 @@ void Client_Connect(const char* serverAddress, int port)
 	{
 		peerClient = enet_host_connect(hostClient, &address, 3, 0);
 		enet_host_flush(hostClient);
+		connecting = btrue;
+		connectionAttemps = 0;
+		timeoutTimer = SDL_GetTicks() + 3000;
 		Print("Trying to connect to %s:%d", serverAddress, port);
 	}
 	else
@@ -70,30 +61,47 @@ void Client_Connect(const char* serverAddress, int port)
 	}
 }
 
+void Client_Abort_Connection()
+{
+	if (!peerClient)
+		return;
+	if (peerClient->state != ENET_PEER_STATE_DISCONNECTED)
+		enet_peer_reset(peerClient);
+	peerClient = NULL;
+	connecting = bfalse;
+}
+
 void Client_S2C()
 {
+	if (!hostClient || (!connecting && !peerClient))
+		return;
+	if (connecting && timeoutTimer < SDL_GetTicks())
+	{
+		Print("Retrying to connect...");
+		timeoutTimer = SDL_GetTicks() + 3000;
+		connectionAttemps++;
+		if (connectionAttemps > 3)
+		{
+			Print("Cannot connect to the server");
+			Client_Abort_Connection();
+			return;
+		}
+	}
+
 	ENetEvent event;
-	/* Wait up to 1000 milliseconds for an event. */
-	while (enet_host_service(hostClient, &event, 1000) > 0)
+
+	while (enet_host_service(hostClient, &event, 0) > 0)
 	{
 		switch (event.type)
 		{
 		case ENET_EVENT_TYPE_CONNECT:
-			printf("A new client connected from %x:%u.\n",
-				event.peer->address.host,
-				event.peer->address.port);
-			/* Store any relevant client information here. */
-			event.peer->data = "Client information";
+			connecting = bfalse;
+			connected = btrue;
+			Print("Connected");
 			break;
 		case ENET_EVENT_TYPE_RECEIVE:
-			printf("A packet of length %u containing %s was received from %s on channel %u.\n",
-				event.packet->dataLength,
-				event.packet->data,
-				event.peer->data,
-				event.channelID);
-			/* Clean up the packet now that we're done using it. */
-			enet_packet_destroy(event.packet);
-
+			Client_Handle_Packet(event.channelID, event.packet);
+			//enet_packet_destroy(event.packet);
 			break;
 
 		case ENET_EVENT_TYPE_DISCONNECT:
@@ -104,9 +112,31 @@ void Client_S2C()
 	}
 }
 
+void Client_Handle_Packet(enet_uint8 chanel, ENetPacket* packet)
+{
+	PacketHeader *header = reinterpret_cast<PacketHeader*>(packet->data);
+	Print("Packet received on chanel %d with packet id %d", chanel, header->cmd);
+}
+
+void Client_Disconnect()
+{
+	if (peerClient)
+	{
+		enet_peer_disconnect(peerClient, DISCONNECT);
+		enet_host_flush(hostClient);
+		enet_peer_reset(peerClient);
+	}
+}
+
 void Client_Cleanup()
 {
-	enet_host_destroy(hostClient);
+	Client_Abort_Connection();
+	Client_Disconnect();
+	if (hostClient)
+	{
+		enet_host_destroy(hostClient);
+		hostClient = NULL;
+	}
 }
 
 void Client_Connect_f()

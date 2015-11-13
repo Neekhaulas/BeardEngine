@@ -58,6 +58,8 @@ void handle_input()
 	}
 }
 
+int lastTime = 0;
+
 int main (int argc, char **argv)
 {
 	ParseArgs( argc, argv );
@@ -69,7 +71,10 @@ int main (int argc, char **argv)
 	for (;;)
 	{
 		handle_input();
-		Game_Update_World();
+		Event_Loop();
+		int time = SDL_GetTicks();
+		Game_Update_World(time, lastTime);
+		lastTime = time;
 	}
 
 	return 0;

@@ -13,7 +13,7 @@ void Event_Queue(int event_type, int value1, int value2)
 		return;
 	}
 	event ev = eventsQueued[tail];
-	ev.event_type = event_type;
+	ev.event_type = (eventType)event_type;
 	ev.value1 = value1;
 	ev.value2 = value2;
 
@@ -51,7 +51,7 @@ void Event_Loop()
 		switch (e.event_type)
 		{
 		case EVENT_KEY:
-			Client_KeyEvent(e.value1, e.value2);
+			Client_KeyEvent(e.value1, (beboolean)e.value2);
 			break;
 		}
 	}
