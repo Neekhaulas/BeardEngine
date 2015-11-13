@@ -74,6 +74,7 @@ int main (int argc, char **argv)
 		Event_Loop();
 		int time = SDL_GetTicks();
 		Game_Update_World(time, lastTime);
+		Render_Draw_Frame();
 		lastTime = time;
 	}
 

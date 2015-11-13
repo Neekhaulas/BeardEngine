@@ -129,6 +129,8 @@ SDL_Texture* Texture_Get(char* id);
 
 /*RENDER*/
 void Render_Init();
+beboolean Render_InitGL();
+void Render_Draw_Frame();
 #endif
 
 /*SERVER*/
