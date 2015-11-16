@@ -1,6 +1,7 @@
 #include "common.h"
 
 static SDL_Window *window = NULL;
+GLuint texture;
 
 void Render_Init()
 {
@@ -52,11 +53,9 @@ beboolean Render_InitGL()
 	bool success = true;
     GLenum error = GL_NO_ERROR;
 
-    //Initialize Projection Matrix
     glMatrixMode( GL_PROJECTION );
     glLoadIdentity();
     
-    //Check for error
     error = glGetError();
     if( error != GL_NO_ERROR )
     {
@@ -64,31 +63,63 @@ beboolean Render_InitGL()
         success = false;
     }
 
-    //Initialize Modelview Matrix
     glMatrixMode( GL_MODELVIEW );
     glLoadIdentity();
 
-    //Check for error
     error = glGetError();
     if( error != GL_NO_ERROR )
     {
         printf( "Error initializing OpenGL! %s\n", gluErrorString( error ) );
         success = false;
     }
+
+	SDL_Surface* Surface = IMG_Load("data/textures/bg_layer4.png");
+	if (Surface == NULL)
+	{
+		Print_Error(1, "Cannot load surface");
+		return bfalse;
+	}
+
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+
+	int Mode = GL_RGB;
+
+	if (Surface->format->BytesPerPixel == 4) {
+		Mode = GL_RGBA;
+	}
+
+	glTexImage2D(GL_TEXTURE_2D, 0, Mode, Surface->w, Surface->h, 0, Mode, GL_UNSIGNED_BYTE, Surface->pixels);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	return btrue;
 }
 
 void Render_Draw_Frame()
 {
-	glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glBegin(GL_TRIANGLES);
-	glColor3ub(255, 0, 0);    glVertex2d(-0.75, -0.75);
-	glColor3ub(0, 255, 0);    glVertex2d(0, 0.75);
-	glColor3ub(0, 0, 255);    glVertex2d(0.75, -0.75);
+	glViewport(0, 0, 800, 600);
+	gluPerspective(45.0, (double)(800) / (double)(600), 0.1f, 100.0f);
+
+	glLoadIdentity();
+
+	glBindTexture(GL_TEXTURE_2D, texture);
+	glEnable(GL_TEXTURE_2D);
+
+	glBegin(GL_QUADS);
+	glTexCoord2f(0.0f, 0.0f);
+	glVertex3f(-0.5f, 0.5f, 0.0f);
+	glTexCoord2f(1.0f, 0.0f);
+	glVertex3f(0.5f, 0.5f, 0.7f);
+	glTexCoord2f(1.0f, 1.0f);
+	glVertex3f(0.5f, -0.5f, 0.7f);
+	glTexCoord2f(0.0f, 1.0f);
+	glVertex3f(-0.5f, -0.5f, 0.0f);
 	glEnd();
 
-	glFlush();
+	glDisable(GL_TEXTURE_2D);
 
 	SDL_GL_SwapWindow(window);
 }
