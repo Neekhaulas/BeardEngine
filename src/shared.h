@@ -142,4 +142,17 @@ enum PacketCmd {
 
 };
 
+/*
+============= TEXTURE =================
+*/
+
+class texture_t
+{
+public:
+	unsigned int textureId;
+	int w;
+	int h;
+};
+
+
 #endif

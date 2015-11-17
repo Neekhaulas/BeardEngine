@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include "shared.h"
 #include <enet/enet.h>
+#include <map>
 
 #ifndef SERVER
 #include <SDL.h>
@@ -124,8 +125,8 @@ void Game_Load_Map(char* mapName);
 
 /*TEXTURE*/
 
-void Texture_Load(char* nameFile, char* id);
-SDL_Texture* Texture_Get(char* id);
+GLuint Texture_Load(char* nameFile);
+texture_t* Texture_Get(char* textureName);
 
 /*RENDER*/
 void Render_Init();

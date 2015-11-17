@@ -1,7 +1,7 @@
 #include "common.h"
 
 static SDL_Window *window = NULL;
-GLuint texture;
+GLuint texture1, texture2;
 
 void Render_Init()
 {
@@ -73,48 +73,38 @@ beboolean Render_InitGL()
         success = false;
     }
 
-	SDL_Surface* Surface = IMG_Load("data/textures/bg_layer4.png");
-	if (Surface == NULL)
-	{
-		Print_Error(1, "Cannot load surface");
-		return bfalse;
-	}
+	texture1 = Texture_Load("bg_layer4.png");
+	texture2 = Texture_Load("89908.png");
 
-	glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_2D, texture);
+	Print("Test %d %d %d", texture1, texture2, texture1);
 
-	int Mode = GL_RGB;
+	glViewport(0, 0, 800, 600);
+	gluPerspective(45.0, (double)(800) / (double)(600), 0.1f, 100.0f);
 
-	if (Surface->format->BytesPerPixel == 4) {
-		Mode = GL_RGBA;
-	}
-
-	glTexImage2D(GL_TEXTURE_2D, 0, Mode, Surface->w, Surface->h, 0, Mode, GL_UNSIGNED_BYTE, Surface->pixels);
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	return btrue;
 }
+
+GLfloat     rtri;
 
 void Render_Draw_Frame()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glViewport(0, 0, 800, 600);
-	gluPerspective(45.0, (double)(800) / (double)(600), 0.1f, 100.0f);
-
 	glLoadIdentity();
 
-	glBindTexture(GL_TEXTURE_2D, texture);
+	glTranslatef(0.0f, 0.0f, 0.0f);
+	glRotatef(rtri, 1.0f, 1.0f, 0.0f);
+
+	glBindTexture(GL_TEXTURE_2D, texture1);
 	glEnable(GL_TEXTURE_2D);
 
 	glBegin(GL_QUADS);
 	glTexCoord2f(0.0f, 0.0f);
 	glVertex3f(-0.5f, 0.5f, 0.0f);
 	glTexCoord2f(1.0f, 0.0f);
-	glVertex3f(0.5f, 0.5f, 0.7f);
+	glVertex3f(0.5f, 0.5f, 0.0f);
 	glTexCoord2f(1.0f, 1.0f);
-	glVertex3f(0.5f, -0.5f, 0.7f);
+	glVertex3f(0.5f, -0.5f, 0.0f);
 	glTexCoord2f(0.0f, 1.0f);
 	glVertex3f(-0.5f, -0.5f, 0.0f);
 	glEnd();
@@ -122,4 +112,6 @@ void Render_Draw_Frame()
 	glDisable(GL_TEXTURE_2D);
 
 	SDL_GL_SwapWindow(window);
+
+	rtri += 1.0f;
 }
