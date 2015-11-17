@@ -1,7 +1,6 @@
 #ifndef __CLIENT_INPUT_H
 #define __CLIENT_INPUT_H
 
-#include "keys.h"
 #include "common.h"
 
 void Client_Init_Input();

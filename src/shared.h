@@ -153,6 +153,14 @@ public:
 	int w;
 	int h;
 };
+/*
+============== KEY ====================
+*/
+
+typedef struct {
+	char	*name;
+	int		keynum;
+} keyname_t;
 
 
 #endif

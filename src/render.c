@@ -73,9 +73,6 @@ beboolean Render_InitGL()
         success = false;
     }
 
-	texture1 = Texture_Load("bg_layer4.png");
-	texture2 = Texture_Load("89908.png");
-
 	Print("Test %d %d %d", texture1, texture2, texture1);
 
 	glViewport(0, 0, 800, 600);

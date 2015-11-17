@@ -45,10 +45,23 @@ void handle_input()
 		{
 		case SDL_KEYDOWN:
 			Event_Queue(EVENT_KEY, e.key.keysym.sym, 1);
+			
 			break;
 
 		case SDL_KEYUP:
 			Event_Queue(EVENT_KEY, e.key.keysym.sym, 0);
+			break;
+
+		case SDL_MOUSEBUTTONDOWN:
+		case SDL_MOUSEBUTTONUP:
+			int b;
+			switch (e.button.button)
+			{
+			case SDL_BUTTON_LEFT: b = KEY_MOUSE1; break;
+			case SDL_BUTTON_MIDDLE: b = KEY_MOUSE2; break;
+			case SDL_BUTTON_RIGHT: b = KEY_MOUSE3; break;
+			}
+			Event_Queue(EVENT_KEY, b, (e.type == SDL_MOUSEBUTTONDOWN) ? 1 : 0);
 			break;
 
 		case SDL_QUIT:
@@ -65,6 +78,7 @@ int main (int argc, char **argv)
 	ParseArgs( argc, argv );
 	if (Init(NULL) != 0)
 		return 1;
+
 	Cvar_Set("width_screen", "1400", CVAR_USER_CREATED, NULL);
 	Cvar_Set("height_screen", "900", CVAR_USER_CREATED, NULL);
 

@@ -5,9 +5,11 @@
 #include <stdio.h>
 #include <string>
 #include <stdlib.h>
-#include "shared.h"
 #include <enet/enet.h>
 #include <map>
+
+#include "shared.h"
+#include "keys.h"
 
 #ifndef SERVER
 #include <SDL.h>
