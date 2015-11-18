@@ -10,6 +10,7 @@
 
 #include "shared.h"
 #include "keys.h"
+#include "platform.h"
 
 #ifndef SERVER
 #include <SDL.h>
@@ -124,6 +125,8 @@ void Client_Send(const uint8 *source, uint32 length, uint8 channelNo, uint32 fla
 void Game_Update_World(int actualTime, int lastTime);
 void Game_Reset_Map();
 void Game_Load_Map(char* mapName);
+
+//This methods are callable only in map editor
 
 /*TEXTURE*/
 

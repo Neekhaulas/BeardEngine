@@ -40,12 +40,12 @@ char* CopyString(const char* str)
 {
 	if (!str)
 		return NULL;
-	char* cpy;
+	char *cpy;
 	cpy = (char*)malloc(strlen(str)+1);
 
 	strcpy(cpy, str);
 
-	return cpy;
+	return (char*)cpy;
 }
 
 #ifndef SERVER
@@ -80,7 +80,7 @@ int Init(char* command)
 	g_gravity = Cvar_Set("g_gravity", "800", CVAR_CHEATS, "Gravity of the game");
 
 	char* date = __DATE__;
-	char* version_str = (char*)malloc(strlen(PRODUCT_NAME " client " VERSION " (%s)") + 1);
+	char version_str[256];
 
 	dedicated = Cvar_Set("dedicated", "0", CVAR_READ_ONLY, "If this is dedicated server");
 	sprintf(version_str, PRODUCT_NAME " client " VERSION " (%s)", date);
