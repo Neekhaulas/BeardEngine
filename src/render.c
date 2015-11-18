@@ -72,45 +72,19 @@ beboolean Render_InitGL()
         success = false;
     }
 
-	glViewport(0, 0, 800, 600);
-	gluPerspective(45.0, (double)(800) / (double)(600), 0.1f, 100.0f);
+	glViewport(0, 0, Cvar_GetInt("width_screen"), Cvar_GetInt("height_screen"));
+	gluPerspective(45.0, (double)(Cvar_GetInt("width_screen")) / (double)(Cvar_GetInt("height_screen")), 0.1f, 100.0f);
 
 	return btrue;
 }
 
 void Render_Draw_Frame()
 {
-	texture_t* tex;
-	int id;
-	float h, w;
-	glGetIntegerv(GL_TEXTURE_BINDING_2D, &id);
-	tex = Texture_Get(id);
-	w = 0;
-	h = 0;
-	if (tex != NULL)
-	{
-		w = tex->w / 2000.0f;
-		h = tex->h / 2000.0f;
-	}
-
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glLoadIdentity();
 
-	glEnable(GL_TEXTURE_2D);
-
-	glBegin(GL_QUADS);
-	glTexCoord2f(0.0f, 0.0f);
-	glVertex3f(-w, h, 0.0f);
-	glTexCoord2f(1.0f, 0.0f);
-	glVertex3f(w, h, 0.0f);
-	glTexCoord2f(1.0f, 1.0f);
-	glVertex3f(w, -h, 0.0f);
-	glTexCoord2f(0.0f, 1.0f);
-	glVertex3f(-w, -h, 0.0f);
-	glEnd();
-
-	glDisable(GL_TEXTURE_2D);
+	Game_Render();
 
 	SDL_GL_SwapWindow(window);
 }

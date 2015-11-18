@@ -64,6 +64,10 @@ void handle_input()
 			Event_Queue(EVENT_KEY, b, (e.type == SDL_MOUSEBUTTONDOWN) ? 1 : 0);
 			break;
 
+		case SDL_MOUSEMOTION:
+			Game_Mouse_Move(e.motion.x, e.motion.y);
+			break;
+
 		case SDL_QUIT:
 			Command_Exec("quit");
 			break;
