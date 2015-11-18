@@ -122,16 +122,19 @@ void Client_Send(const uint8 *source, uint32 length, uint8 channelNo, uint32 fla
 
 /*GAME*/
 
+void Game_Init();
 void Game_Update_World(int actualTime, int lastTime);
 void Game_Reset_Map();
 void Game_Load_Map(char* mapName);
 
 //This methods are callable only in map editor
 
+void Game_Map_Change_Texture(GLuint id);
+
 /*TEXTURE*/
 
 GLuint Texture_Load(char* nameFile);
-texture_t* Texture_Get(char* textureName);
+texture_t* Texture_Get(unsigned int id);
 
 /*RENDER*/
 void Render_Init();

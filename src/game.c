@@ -4,6 +4,7 @@
 #include <stdio.h>
 
 std::vector<static_entity> static_entities;
+GLuint actual_texture;
 
 void Game_Load_Map(char* mapName)
 {
@@ -30,6 +31,7 @@ void Game_Load_Map(char* mapName)
 	char* fileName = (char*)malloc(sizeof(char)* 256);
 	char* file = (char*)malloc(sizeof(char) * 256);
 	int size;
+	actual_texture = 1;
 
 	fscanf(list, "%d", &size);
 	for (int i = 0; i < size; i++)
@@ -41,7 +43,32 @@ void Game_Load_Map(char* mapName)
 	} 
 	fclose(list);
 
+	Game_Map_Change_Texture(actual_texture);
+
 	_close(f);
+}
+
+void Game_Map_Change_Texture(GLuint id)
+{
+	glBindTexture(GL_TEXTURE_2D, id);
+}
+
+void Texture_Next()
+{
+	Game_Map_Change_Texture(++actual_texture);
+	Print("Next texture : %d", actual_texture);
+}
+
+void Texture_Prev()
+{
+	Game_Map_Change_Texture(--actual_texture);
+	Print("Prev texture : %d", actual_texture);
+}
+
+void Game_Init()
+{
+	Command_Add("texture_next", Texture_Next);
+	Command_Add("texture_prev", Texture_Prev);
 }
 
 void Game_Update_World(int actualTime, int lastTime)

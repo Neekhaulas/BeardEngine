@@ -152,6 +152,7 @@ public:
 	unsigned int textureId;
 	int w;
 	int h;
+	char* name;
 };
 /*
 ============== KEY ====================

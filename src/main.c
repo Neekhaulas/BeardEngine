@@ -79,9 +79,6 @@ int main (int argc, char **argv)
 	if (Init(NULL) != 0)
 		return 1;
 
-	Cvar_Set("width_screen", "1400", CVAR_USER_CREATED, NULL);
-	Cvar_Set("height_screen", "900", CVAR_USER_CREATED, NULL);
-
 	for (;;)
 	{
 		handle_input();

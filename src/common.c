@@ -50,12 +50,6 @@ char* CopyString(const char* str)
 
 #ifndef SERVER
 
-Cvar* dedicated;
-Cvar* version;
-Cvar* developper;
-Cvar* s_masterserver;
-Cvar* g_gravity;
-
 void Shutdown()
 {
 	SDL_Quit();
@@ -65,8 +59,6 @@ void Shutdown()
 
 int Init(char* command)
 {
-	Render_Init();
-
 	Cvar_Init();
 
 	Command_Init();
@@ -75,20 +67,28 @@ int Init(char* command)
 
 	//Init Cvar
 
-	developper = Cvar_Set("developer", "1", CVAR_READ_ONLY, "If the developper mod is on");
-	s_masterserver = Cvar_Set("s_masterserver", MASTERSERVER, CVAR_READ_ONLY, "Address of the master server");
-	g_gravity = Cvar_Set("g_gravity", "800", CVAR_CHEATS, "Gravity of the game");
+	Cvar_Set("developer", "1", CVAR_READ_ONLY, "If the developper mod is on");
+	Cvar_Set("s_masterserver", MASTERSERVER, CVAR_READ_ONLY, "Address of the master server");
+	Cvar_Set("g_gravity", "800", CVAR_CHEATS, "Gravity of the game");
 
 	char* date = __DATE__;
 	char version_str[256];
 
-	dedicated = Cvar_Set("dedicated", "0", CVAR_READ_ONLY, "If this is dedicated server");
+	Cvar_Set("dedicated", "0", CVAR_READ_ONLY, "If this is dedicated server");
 	sprintf(version_str, PRODUCT_NAME " client " VERSION " (%s)", date);
-	version = Cvar_Set("version", version_str, CVAR_READ_ONLY, "Version of the client");
+	Cvar_Set("version", version_str, CVAR_READ_ONLY, "Version of the client");
+	Cvar_Set("width_screen", "1024", CVAR_USER_CREATED, NULL);
+	Cvar_Set("height_screen", "768", CVAR_USER_CREATED, NULL);
+
+	Command_Exec("exec var.cfg");
+	
+	Game_Init();
+
+	Render_Init();
 
 	Client_Init();
-	
-	Command_Exec("exec autoexec.cfg");
+
+	Command_Exec("exec bind.cfg");
 
 	return 0;
 }

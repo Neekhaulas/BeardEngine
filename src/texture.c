@@ -1,12 +1,13 @@
 #include "common.h"
 
-std::map<char*, texture_t*> textures;
+std::map<unsigned int, texture_t*> textures;
+unsigned int actualCount = 1;
 
-texture_t* Texture_Get(char* textureName)
+texture_t* Texture_Get(unsigned int id)
 {
-	if (textures[textureName] != NULL)
+	if (textures[id] != NULL)
 	{
-		return textures[textureName];
+		return textures[id];
 	}
 	return 0;
 }
@@ -43,11 +44,11 @@ GLuint Texture_Load(char* nameFile)
 	tex->textureId = texture;
 	tex->w = surface->w;
 	tex->h = surface->h;
+	tex->name = nameFile;
 
-	textures[nameFile] = tex;
+	textures[actualCount++] = tex;
 
 	SDL_FreeSurface(surface);
-
 
 	return texture;
 }

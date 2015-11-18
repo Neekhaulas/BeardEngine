@@ -1,7 +1,6 @@
 #include "common.h"
 
 static SDL_Window *window = NULL;
-GLuint texture1, texture2;
 
 void Render_Init()
 {
@@ -16,7 +15,7 @@ void Render_Init()
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
-	window = SDL_CreateWindow(CLIENT_WINDOW_TITLE, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
+	window = SDL_CreateWindow(CLIENT_WINDOW_TITLE, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, Cvar_GetInt("width_screen"), Cvar_GetInt("height_screen"), SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
 	if (!window)
 	{
 		Print_Error(1, "Can't create SDL window");
@@ -73,42 +72,45 @@ beboolean Render_InitGL()
         success = false;
     }
 
-	Print("Test %d %d %d", texture1, texture2, texture1);
-
 	glViewport(0, 0, 800, 600);
 	gluPerspective(45.0, (double)(800) / (double)(600), 0.1f, 100.0f);
 
 	return btrue;
 }
 
-GLfloat     rtri;
-
 void Render_Draw_Frame()
 {
+	texture_t* tex;
+	int id;
+	float h, w;
+	glGetIntegerv(GL_TEXTURE_BINDING_2D, &id);
+	tex = Texture_Get(id);
+	w = 0;
+	h = 0;
+	if (tex != NULL)
+	{
+		w = tex->w / 2000.0f;
+		h = tex->h / 2000.0f;
+	}
+
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glLoadIdentity();
 
-	glTranslatef(0.0f, 0.0f, 0.0f);
-	glRotatef(rtri, 1.0f, 1.0f, 0.0f);
-
-	glBindTexture(GL_TEXTURE_2D, texture1);
 	glEnable(GL_TEXTURE_2D);
 
 	glBegin(GL_QUADS);
 	glTexCoord2f(0.0f, 0.0f);
-	glVertex3f(-0.5f, 0.5f, 0.0f);
+	glVertex3f(-w, h, 0.0f);
 	glTexCoord2f(1.0f, 0.0f);
-	glVertex3f(0.5f, 0.5f, 0.0f);
+	glVertex3f(w, h, 0.0f);
 	glTexCoord2f(1.0f, 1.0f);
-	glVertex3f(0.5f, -0.5f, 0.0f);
+	glVertex3f(w, -h, 0.0f);
 	glTexCoord2f(0.0f, 1.0f);
-	glVertex3f(-0.5f, -0.5f, 0.0f);
+	glVertex3f(-w, -h, 0.0f);
 	glEnd();
 
 	glDisable(GL_TEXTURE_2D);
 
 	SDL_GL_SwapWindow(window);
-
-	rtri += 1.0f;
 }
