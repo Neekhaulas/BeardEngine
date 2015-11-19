@@ -15,18 +15,19 @@ void Texture_Draw(texture_t* tex, float w, float h, float size_w, float size_h, 
 		return;
 	glBindTexture(GL_TEXTURE_2D, tex->textureId);
 	glEnable(GL_TEXTURE_2D);
-	w = w / 1000.f;
-	h = h / 1000.f;
+	glLoadIdentity();
+	glOrtho(0, 800, 600, 0, 0, 100);
+	glTranslatef(x, y, 0);
 
 	glBegin(GL_QUADS);
 	glTexCoord2f(0.0f, 0.0f);
-	glVertex3f((-w/2)*size_w, (h/2)*size_h, 0.0f);
+	glVertex3f((w)*size_w, (-h)*size_h, 0.0f);
 	glTexCoord2f(1.0f, 0.0f);
-	glVertex3f((w/2)*size_w, (h/2)*size_h, 0.0f);
+	glVertex3f((-w)*size_w, (-h)*size_h, 0.0f);
 	glTexCoord2f(1.0f, 1.0f);
-	glVertex3f((w/2)*size_w, (-h/2)*size_h, 0.0f);
+	glVertex3f((-w)*size_w, (h)*size_h, 0.0f);
 	glTexCoord2f(0.0f, 1.0f);
-	glVertex3f((-w/2)*size_w, (-h/2)*size_h, 0.0f);
+	glVertex3f((w)*size_w, (h)*size_h, 0.0f);
 	glEnd();
 
 	glDisable(GL_TEXTURE_2D);

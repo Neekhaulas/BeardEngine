@@ -68,6 +68,11 @@ void handle_input()
 			Game_Mouse_Move(e.motion.x, e.motion.y);
 			break;
 
+		case SDL_MOUSEWHEEL:
+			Print("mouse wheel : %d", e.wheel.y);
+			Game_Mouse_Wheel(e.wheel.y);
+			break;
+
 		case SDL_QUIT:
 			Command_Exec("quit");
 			break;

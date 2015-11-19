@@ -7,6 +7,8 @@ std::vector<static_entity*> static_entities;
 static_entity* creating_entity;
 GLuint actual_texture;
 beboolean editing;
+int mouseX;
+int mouseY;
 
 void Game_Load_Map(char* mapName)
 {
@@ -67,6 +69,8 @@ void Game_Toggle_Editor()
 void Game_Map_Change_Texture(GLuint id)
 {
 	creating_entity->tex = Texture_Get(id);
+	creating_entity->scale.x = 1;
+	creating_entity->scale.y = 1;
 	creating_entity->size.x = creating_entity->tex->w;
 	creating_entity->size.y = creating_entity->tex->h;
 }
@@ -87,12 +91,29 @@ void Texture_Prev()
 	Print("Prev texture : %d", actual_texture);
 }
 
+void Attack()
+{
+	if (editing)
+	{
+		creating_entity->position.x = mouseX;
+		creating_entity->position.y = mouseY;
+		static_entities.push_back(creating_entity);
+		creating_entity = new static_entity();
+		creating_entity->tex = Texture_Get(actual_texture);
+		creating_entity->scale.x = 1;
+		creating_entity->scale.y = 1;
+		creating_entity->size.x = creating_entity->tex->w;
+		creating_entity->size.y = creating_entity->tex->h;
+	}
+}
+
 void Game_Init()
 {
 	editing = bfalse;
 	Command_Add("texture_next", Texture_Next);
 	Command_Add("texture_prev", Texture_Prev);
 	Command_Add("toggle_editor", Game_Toggle_Editor);
+	Command_Add("+attack", Attack);
 }
 
 void Game_Update_World(int actualTime, int lastTime)
@@ -100,19 +121,34 @@ void Game_Update_World(int actualTime, int lastTime)
 	Client_S2C();
 }
 
+
 void Game_Render()
 {
 	for (int i = 0; i < static_entities.size(); i++)
 	{
-		Texture_Draw(static_entities.at(i)->tex, 2, 2, 1, 1, 0, 0);
+		Texture_Draw(static_entities.at(i)->tex, static_entities.at(i)->size.x, static_entities.at(i)->size.y, static_entities.at(i)->scale.x, static_entities.at(i)->scale.y, static_entities.at(i)->position.x, static_entities.at(i)->position.y);
 	}
 	if (creating_entity != NULL)
 	{
-		Texture_Draw(creating_entity->tex, creating_entity->size.x, creating_entity->size.y, 1, 1, 0, 0);
+		Texture_Draw(creating_entity->tex, creating_entity->size.x, creating_entity->size.y, creating_entity->scale.x, creating_entity->scale.y, mouseX, mouseY);
 	}
 }
 
 void Game_Mouse_Move(int x, int y)
 {
+	mouseX = x;
+	mouseY = y;
+}
 
+void Game_Mouse_Wheel(int value)
+{
+	if (editing)
+	{
+		creating_entity->scale.x += value / 20.f;
+		creating_entity->scale.y += value / 20.f;
+	}
+	else
+	{
+
+	}
 }

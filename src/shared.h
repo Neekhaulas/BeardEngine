@@ -123,14 +123,14 @@ class entity
 public:
 	int id;
 	vec position;
+	vec size;
+	vec scale;
 	class texture_t* tex;
 };
 
 class static_entity : public entity
 {
 public:
-	vec size;
-	int rotation;
 };
 
 class dynamic_entity : public entity

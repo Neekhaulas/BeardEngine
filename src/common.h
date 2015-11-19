@@ -128,6 +128,7 @@ void Game_Reset_Map();
 void Game_Load_Map(char* mapName);
 void Game_Render();
 void Game_Mouse_Move(int x, int y);
+void Game_Mouse_Wheel(int value);
 
 //This methods are callable only in map editor
 
