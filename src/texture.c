@@ -9,7 +9,7 @@ void Texture_Unload_All()
 	actualCount = 1;
 }
 
-void Texture_Draw(texture_t* tex, float w, float h, float size_w, float size_h, float x, float y)
+void Texture_Draw(texture_t* tex, float w, float h, float size_w, float size_h, float x, float y, int debug)
 {
 	if (tex == NULL)
 		return;
@@ -20,17 +20,43 @@ void Texture_Draw(texture_t* tex, float w, float h, float size_w, float size_h, 
 	glTranslatef(x, y, 0);
 
 	glBegin(GL_QUADS);
-	glTexCoord2f(0.0f, 0.0f);
-	glVertex3f((w)*size_w, (-h)*size_h, 0.0f);
+
 	glTexCoord2f(1.0f, 0.0f);
+	glVertex3f((w)*size_w, (-h)*size_h, 0.0f);
+
+	glTexCoord2f(0.0f, 0.0f);
 	glVertex3f((-w)*size_w, (-h)*size_h, 0.0f);
-	glTexCoord2f(1.0f, 1.0f);
-	glVertex3f((-w)*size_w, (h)*size_h, 0.0f);
+
 	glTexCoord2f(0.0f, 1.0f);
+	glVertex3f((-w)*size_w, (h)*size_h, 0.0f);
+
+	glTexCoord2f(1.0f, 1.0f);
 	glVertex3f((w)*size_w, (h)*size_h, 0.0f);
+
 	glEnd();
 
 	glDisable(GL_TEXTURE_2D);
+
+	if (debug > 0)
+	{
+		glColor3f(1.0f, 1.0f, 1.0f);
+		glBegin(GL_LINES);
+		glVertex3f((w)*size_w, (-h)*size_h, 0.0f);
+		glVertex3f((-w)*size_w, (-h)*size_h, 0.0f);
+		glEnd();
+		glBegin(GL_LINES);
+		glVertex3f((-w)*size_w, (-h)*size_h, 0.0f);
+		glVertex3f((-w)*size_w, (h)*size_h, 0.0f);
+		glEnd();
+		glBegin(GL_LINES);
+		glVertex3f((-w)*size_w, (h)*size_h, 0.0f);
+		glVertex3f((w)*size_w, (h)*size_h, 0.0f);
+		glEnd();
+		glBegin(GL_LINES);
+		glVertex3f((w)*size_w, (h)*size_h, 0.0f);
+		glVertex3f((w)*size_w, (-h)*size_h, 0.0f);
+		glEnd();
+	}
 }
 
 texture_t* Texture_Get(unsigned int id)

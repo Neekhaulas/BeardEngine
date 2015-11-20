@@ -136,7 +136,7 @@ void Game_Map_Change_Texture(GLuint id);
 
 /*TEXTURE*/
 
-void Texture_Draw(texture_t* tex, float w, float h, float size_w, float size_h, float x, float y);
+void Texture_Draw(texture_t* tex, float w, float h, float size_w, float size_h, float x, float y, int debug);
 GLuint Texture_Load(char* nameFile);
 texture_t* Texture_Get(unsigned int id);
 void Texture_Unload_All();
