@@ -69,7 +69,6 @@ void handle_input()
 			break;
 
 		case SDL_MOUSEWHEEL:
-			Print("mouse wheel : %d", e.wheel.y);
 			Game_Mouse_Wheel(e.wheel.y);
 			break;
 

@@ -125,7 +125,7 @@ public:
 	vec position;
 	vec size;
 	vec scale;
-	class texture_t* tex;
+	GLuint tex;
 };
 
 class static_entity : public entity

@@ -1,6 +1,7 @@
 #include "common.h"
+#include <vector>
 
-std::map<unsigned int, texture_t*> textures;
+std::vector<texture_t*> textures;
 unsigned int actualCount = 1;
 
 void Texture_Unload_All()
@@ -9,11 +10,9 @@ void Texture_Unload_All()
 	actualCount = 1;
 }
 
-void Texture_Draw(texture_t* tex, float w, float h, float size_w, float size_h, float x, float y, int debug)
+void Texture_Draw(GLuint tex, float w, float h, float size_w, float size_h, float x, float y, int debug)
 {
-	if (tex == NULL)
-		return;
-	glBindTexture(GL_TEXTURE_2D, tex->textureId);
+	glBindTexture(GL_TEXTURE_2D, tex);
 	glEnable(GL_TEXTURE_2D);
 	glLoadIdentity();
 	glOrtho(0, 800, 600, 0, 0, 100);
@@ -61,9 +60,12 @@ void Texture_Draw(texture_t* tex, float w, float h, float size_w, float size_h, 
 
 texture_t* Texture_Get(unsigned int id)
 {
-	if (textures[id] != NULL)
+	for (unsigned int i = 0; i < textures.size(); i++)
 	{
-		return textures[id];
+		if (textures.at(i)->textureId == id)
+		{
+			return textures.at(i);
+		}
 	}
 	return 0;
 }
@@ -78,7 +80,7 @@ GLuint Texture_Load(char* nameFile)
 	surface = IMG_Load(nameFile);
 	if (surface == NULL)
 	{
-		Print_Error(1, "Cannot load surface");
+		Print_Error(1, "Cannot load image %s", nameFile);
 		return NULL;
 	}
 
@@ -100,11 +102,13 @@ GLuint Texture_Load(char* nameFile)
 	tex->textureId = texture;
 	tex->w = surface->w;
 	tex->h = surface->h;
-	tex->name = nameFile;
+	tex->name = CopyString(nameFile);
 
-	textures[actualCount++] = tex;
+	textures.push_back(tex);
 
 	SDL_FreeSurface(surface);
+
+	Print("Loading %s", nameFile);
 
 	return texture;
 }

@@ -126,6 +126,8 @@ void Game_Init();
 void Game_Update_World(int actualTime, int lastTime);
 void Game_Reset_Map();
 void Game_Load_Map(char* mapName);
+void Game_New_Map();
+void Game_Save_Map();
 void Game_Render();
 void Game_Mouse_Move(int x, int y);
 void Game_Mouse_Wheel(int value);
@@ -136,7 +138,7 @@ void Game_Map_Change_Texture(GLuint id);
 
 /*TEXTURE*/
 
-void Texture_Draw(texture_t* tex, float w, float h, float size_w, float size_h, float x, float y, int debug);
+void Texture_Draw(GLuint tex, float w, float h, float size_w, float size_h, float x, float y, int debug);
 GLuint Texture_Load(char* nameFile);
 texture_t* Texture_Get(unsigned int id);
 void Texture_Unload_All();
