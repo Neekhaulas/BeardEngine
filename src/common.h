@@ -72,7 +72,7 @@ char* Cvar_GetString(char* var_name);
 void Cvar_Reset(char* var_name);
 //Reset the Cvar to his degault 
 
-beboolean Cvar_Command();
+bool Cvar_Command();
 //if the last command is a Cvar
 
 /*COMMAND*/
@@ -103,11 +103,15 @@ void Event_Queue(int event_type, int value1, int value2);
 void Event_Loop();
 event Event_Get();
 
+/*ENTITY*/
+
+void Entity_Update(dynamic_entity *ent);
+
 #ifndef SERVER
 
 /*CLIENT*/
 
-void Client_KeyEvent(int key, beboolean down);
+void Client_KeyEvent(int key, bool down);
 void Client_Init();
 void Client_Process_Events();
 void Client_Disconnect();
@@ -145,13 +149,13 @@ void Texture_Unload_All();
 
 /*RENDER*/
 void Render_Init();
-beboolean Render_InitGL();
+bool Render_InitGL();
 void Render_Draw_Frame();
 #endif
 
 /*SERVER*/
 
-beboolean Server_Init(int argc, char** argv);
+bool Server_Init(int argc, char** argv);
 void Server_Cleanup(void);
 void Server_Frame();
 void Server_Send_Game_State();

@@ -33,9 +33,6 @@ typedef unsigned long long uint64;
 #define MAX_EVENTS_QUEUED 256
 #define PLAYER_PER_TEAM 1
 
-
-typedef enum { bfalse, btrue } beboolean;
-
 /*
 ============= VECTOR ===============
 */
@@ -68,7 +65,7 @@ struct _Cvar
 	int			value;
 	float		valuef;
 	int			countModified;
-	beboolean	modified;
+	bool	modified;
 	int			flags;
 
 	Cvar		*next;
@@ -125,6 +122,7 @@ public:
 	vec position;
 	vec size;
 	vec scale;
+	vec origin;
 	GLuint tex;
 };
 
@@ -137,7 +135,16 @@ class dynamic_entity : public entity
 {
 public:
 	vec velocity;
+	vec gravity;
+	bool applyGravity;
+	bool collide;
+	bool hasGravity(){ return applyGravity; }
+	bool needCollide(){ return collide; }
 };
+
+/*
+============= COLLISION ===============
+*/
 
 /*
 ============= OPCODES =================

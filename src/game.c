@@ -4,10 +4,11 @@
 #include <stdio.h>
 
 std::vector<static_entity*> static_entities;
+std::vector<dynamic_entity*> dynamic_entities;
 static_entity* creating_entity;
 GLuint actual_texture;
-beboolean editing;
-beboolean map_opened;
+bool editing;
+bool map_opened;
 char* map_name;
 int mouseX;
 int mouseY;
@@ -36,12 +37,12 @@ void Game_New_Map()
 		Texture_Load(file);
 	}
 	fclose(list);
-	map_opened = btrue;
+	map_opened = true;
 }
 
 void Game_Reset_Map()
 {
-	map_opened = bfalse;
+	map_opened = false;
 	map_name = NULL;
 	Texture_Unload_All();
 	static_entities.clear();
@@ -150,14 +151,11 @@ void Game_Load_Map(char* mapName)
 		static_entity *ent = new static_entity;
 		read(f, ent, sizeof(static_entity));
 		ent->tex = texture_map[ent->tex];
-		//Print("ID : %d Pos x : %f Pos y : %f size x : %f size y : %f texture : %d scale x : %f scale y : %f", ent.id, ent.position.x, ent.position.y, ent.size.x, ent.size.y, ent.tex, ent.scale.x, ent.scale.y);
 		static_entities.push_back(ent);
 	}
 	close(f);
 
-	Print("Size entities %d", static_entities.size());
-
-	map_opened = btrue;
+	map_opened = true;
 }
 
 void Game_Toggle_Editor()
@@ -165,7 +163,7 @@ void Game_Toggle_Editor()
 	if (!editing)
 	{
 		Print("Editor mode activated");
-		editing = btrue;
+		editing = true;
 		creating_entity = new static_entity();
 	}
 	else
@@ -173,7 +171,7 @@ void Game_Toggle_Editor()
 		Print("Editor mode deactivated");
 		delete creating_entity;
 		creating_entity = NULL;
-		editing = bfalse;
+		editing = false;
 	}
 }
 
@@ -226,8 +224,8 @@ void Attack()
 
 void Game_Init()
 {
-	editing = bfalse;
-	map_opened = bfalse;
+	editing = false;
+	map_opened = false;
 	Command_Add("texture_next", Texture_Next);
 	Command_Add("texture_prev", Texture_Prev);
 	Command_Add("toggle_editor", Game_Toggle_Editor);

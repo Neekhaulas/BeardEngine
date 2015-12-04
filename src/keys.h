@@ -15,14 +15,14 @@ typedef enum
 
 typedef struct _key
 {
-	beboolean pressed;
+	bool pressed;
 	char* binding;
 } key;
 
 int Keys_StringToKeyNum(char *str);
 void Keys_Bind_f();
 
-beboolean Keys_IsDown(int keynum);
+bool Keys_IsDown(int keynum);
 
 char* Keys_GetBinding(int keynum);
 

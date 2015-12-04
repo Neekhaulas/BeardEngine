@@ -24,10 +24,10 @@ void Command_Parse(const char* cmd)
 	char line[1024];
 	char *cmd_str = CopyString(cmd);
 	char *str;
-	beboolean inQuote;
+	bool inQuote;
 
 	size = strlen(cmd_str);
-	inQuote = bfalse;
+	inQuote = false;
 
 	while (size)
 	{
@@ -43,14 +43,14 @@ void Command_Parse(const char* cmd)
 			{
 				if (!inQuote)
 				{
-					inQuote = btrue;
+					inQuote = true;
 					i++;
 					size -= i;
 					memmove(str, str + i, size);
 				}
 				else
 				{
-					inQuote = bfalse;
+					inQuote = false;
 					break;
 				}
 			}

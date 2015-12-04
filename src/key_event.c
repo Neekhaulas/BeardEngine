@@ -69,7 +69,7 @@ char* Keys_GetBinding(int keynum)
 	return keys[keynum].binding;
 }
 
-void Keys_ExecBinding(int key, beboolean down)
+void Keys_ExecBinding(int key, bool down)
 {
 	char buf[1024], *p = buf, *end;
 	if (!keys[key].binding || !keys[key].binding[0])
@@ -103,19 +103,19 @@ void Keys_ExecBinding(int key, beboolean down)
 
 void Client_KeyDownEvent(int key)
 {
-	keys[key].pressed = btrue;
+	keys[key].pressed = true;
 
-	Keys_ExecBinding(key, btrue);
+	Keys_ExecBinding(key, true);
 }
 
 void Client_KeyUpEvent(int key)
 {
-	keys[key].pressed = bfalse;
+	keys[key].pressed = false;
 
-	Keys_ExecBinding(key, bfalse);
+	Keys_ExecBinding(key, false);
 }
 
-void Client_KeyEvent(int key, beboolean down)
+void Client_KeyEvent(int key, bool down)
 {
 	if (down)
 		Client_KeyDownEvent(key);

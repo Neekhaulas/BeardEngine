@@ -72,7 +72,7 @@ Cvar* Cvar_Set(char* var_name, char* var_value, int var_flag, char* var_desc)
 		var->value = atoi(var_value);
 		var->valuef = atof(var_value);
 		var->flags = var_flag;
-		var->modified = btrue;
+		var->modified = true;
 		var->countModified = 1;
 		return var;
 	}
@@ -96,7 +96,7 @@ Cvar* Cvar_Set(char* var_name, char* var_value, int var_flag, char* var_desc)
 	var->value = atoi(var_value);
 	var->valuef = atof(var_value);
 	var->flags = var_flag;
-	var->modified = btrue;
+	var->modified = true;
 	var->countModified = 1;
 	var->desc = var_desc;
 
@@ -195,30 +195,30 @@ void Cvar_Reset(char* var_name)
 		var->string = var->reset;
 		var->value = atoi(var->reset);
 		var->valuef = atof(var->reset);
-		var->modified = btrue;
+		var->modified = true;
 		var->countModified++;
 	}
 }
 
-beboolean Cvar_Command()
+bool Cvar_Command()
 {
 	Cvar *cvar;
 
 	cvar = Cvar_Find(Command_Argv(0));
 	if (!cvar)
 	{
-		return bfalse;
+		return false;
 	}
 
 	if (Command_Argc() == 1)
 	{
 		Cvar_Print(cvar);
-		return btrue;
+		return true;
 	}
 
 	Cvar_Set(cvar->name, Command_Argv(1), 0, NULL);
 
-	return btrue;
+	return true;
 	//set
 }
 

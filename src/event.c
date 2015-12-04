@@ -51,7 +51,7 @@ void Event_Loop()
 		switch (e.event_type)
 		{
 		case EVENT_KEY:
-			Client_KeyEvent(e.value1, (beboolean)e.value2);
+			Client_KeyEvent(e.value1, (bool)e.value2);
 			break;
 		}
 	}

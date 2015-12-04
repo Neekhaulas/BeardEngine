@@ -73,14 +73,14 @@ void Server_Send_Infos(int clientNumber)
 void Server_Frame()
 {
 	ENetEvent event;
-	beboolean eventProcessed = bfalse;
+	bool eventProcessed = false;
 	while (!eventProcessed)
 	{
 		if (enet_host_check_events(serverHost, &event) <= 0)
 		{
 			if (enet_host_service(serverHost, &event, 5) <= 0)
 				break;
-			eventProcessed = btrue;
+			eventProcessed = true;
 		}
 		switch (event.type)
 		{
@@ -118,7 +118,7 @@ void Server_Frame()
 	Server_Send_Game_State();
 }
 
-beboolean Server_Init(int argc, char** argv)
+bool Server_Init(int argc, char** argv)
 {
 	/*
 	Parser les arguments
@@ -154,7 +154,7 @@ beboolean Server_Init(int argc, char** argv)
 		//Console_Frame();
 	}
 		
-	return btrue;
+	return true;
 }
 
 void Server_Cleanup(void)

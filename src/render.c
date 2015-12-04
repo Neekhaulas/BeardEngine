@@ -47,7 +47,7 @@ void Render_Init()
 	}
 }
 
-beboolean Render_InitGL()
+bool Render_InitGL()
 {
 	bool success = true;
     GLenum error = GL_NO_ERROR;
@@ -75,7 +75,7 @@ beboolean Render_InitGL()
 	glViewport(0, 0, Cvar_GetInt("width_screen"), Cvar_GetInt("height_screen"));
 	gluPerspective(45.0, (double)(Cvar_GetInt("width_screen")) / (double)(Cvar_GetInt("height_screen")), 0.1f, 100.0f);
 
-	return btrue;
+	return true;
 }
 
 void Render_Draw_Frame()

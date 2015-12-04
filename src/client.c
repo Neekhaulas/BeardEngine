@@ -9,7 +9,7 @@ ENetHost *hostClient = NULL;
 ENetPeer *peerClient = NULL;
 int connectionAttemps = 0;
 unsigned int timeoutTimer = 0;
-beboolean connecting = bfalse, connected = bfalse;
+bool connecting = false, connected = false;
 
 
 void Client_Init()
@@ -50,7 +50,7 @@ void Client_Connect(const char* serverAddress, int port)
 	{
 		peerClient = enet_host_connect(hostClient, &address, 3, 0);
 		enet_host_flush(hostClient);
-		connecting = btrue;
+		connecting = true;
 		connectionAttemps = 0;
 		timeoutTimer = SDL_GetTicks() + 3000;
 		Print("Trying to connect to %s:%d", serverAddress, port);
@@ -68,7 +68,7 @@ void Client_Abort_Connection()
 	if (peerClient->state != ENET_PEER_STATE_DISCONNECTED)
 		enet_peer_reset(peerClient);
 	peerClient = NULL;
-	connecting = bfalse;
+	connecting = false;
 }
 
 void Client_S2C()
@@ -95,8 +95,8 @@ void Client_S2C()
 		switch (event.type)
 		{
 		case ENET_EVENT_TYPE_CONNECT:
-			connecting = bfalse;
-			connected = btrue;
+			connecting = false;
+			connected = true;
 			Print("Connected");
 			break;
 		case ENET_EVENT_TYPE_RECEIVE:
