@@ -36,9 +36,13 @@ typedef unsigned long long uint64;
 /*
 ============= VECTOR ===============
 */
-typedef struct _vec vec;
-
-struct _vec { float x, y, z; };
+class vec
+{
+public:
+	float x;
+	float y;
+	float z;
+};
 
 /*
 ============= CVAR =================
@@ -121,7 +125,6 @@ public:
 	int id;
 	vec position;
 	vec size;
-	vec scale;
 	vec origin;
 	GLuint tex;
 };

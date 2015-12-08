@@ -10,7 +10,7 @@ void Texture_Unload_All()
 	actualCount = 1;
 }
 
-void Texture_Draw(GLuint tex, float w, float h, float size_w, float size_h, float x, float y, int debug)
+void Texture_Draw(GLuint tex, float w, float h, float x, float y, int debug)
 {
 	glBindTexture(GL_TEXTURE_2D, tex);
 	glEnable(GL_TEXTURE_2D);
@@ -21,16 +21,16 @@ void Texture_Draw(GLuint tex, float w, float h, float size_w, float size_h, floa
 	glBegin(GL_QUADS);
 
 	glTexCoord2f(1.0f, 0.0f);
-	glVertex3f((w)*size_w, (-h)*size_h, 0.0f);
+	glVertex3f(w, -h, 0.0f);
 
 	glTexCoord2f(0.0f, 0.0f);
-	glVertex3f((-w)*size_w, (-h)*size_h, 0.0f);
+	glVertex3f(-w, -h, 0.0f);
 
 	glTexCoord2f(0.0f, 1.0f);
-	glVertex3f((-w)*size_w, (h)*size_h, 0.0f);
+	glVertex3f(-w, h, 0.0f);
 
 	glTexCoord2f(1.0f, 1.0f);
-	glVertex3f((w)*size_w, (h)*size_h, 0.0f);
+	glVertex3f(w, h, 0.0f);
 
 	glEnd();
 
@@ -40,20 +40,20 @@ void Texture_Draw(GLuint tex, float w, float h, float size_w, float size_h, floa
 	{
 		glColor3f(1.0f, 1.0f, 1.0f);
 		glBegin(GL_LINES);
-		glVertex3f((w)*size_w, (-h)*size_h, 0.0f);
-		glVertex3f((-w)*size_w, (-h)*size_h, 0.0f);
+		glVertex3f(w, -h, 0.0f);
+		glVertex3f(-w, -h, 0.0f);
 		glEnd();
 		glBegin(GL_LINES);
-		glVertex3f((-w)*size_w, (-h)*size_h, 0.0f);
-		glVertex3f((-w)*size_w, (h)*size_h, 0.0f);
+		glVertex3f(-w, -h, 0.0f);
+		glVertex3f(-w, h, 0.0f);
 		glEnd();
 		glBegin(GL_LINES);
-		glVertex3f((-w)*size_w, (h)*size_h, 0.0f);
-		glVertex3f((w)*size_w, (h)*size_h, 0.0f);
+		glVertex3f(-w, h, 0.0f);
+		glVertex3f(w, h, 0.0f);
 		glEnd();
 		glBegin(GL_LINES);
-		glVertex3f((w)*size_w, (h)*size_h, 0.0f);
-		glVertex3f((w)*size_w, (-h)*size_h, 0.0f);
+		glVertex3f(w, h, 0.0f);
+		glVertex3f(w, -h, 0.0f);
 		glEnd();
 	}
 }

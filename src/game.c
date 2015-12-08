@@ -1,7 +1,6 @@
 #include "common.h"
 #include <vector>
 #include <fcntl.h>
-#include <stdio.h>
 
 std::vector<static_entity*> static_entities;
 std::vector<dynamic_entity*> dynamic_entities;
@@ -73,7 +72,6 @@ void Game_Save_Map()
 			static_entity ent;
 			ent.id = i;
 			ent.position = static_entities.at(i)->position;
-			ent.scale = static_entities.at(i)->scale;
 			ent.size = static_entities.at(i)->size;
 			ent.tex = list_textures[tex->name];
 			map_entities.push_back(ent);
@@ -182,8 +180,6 @@ void Game_Map_Change_Texture(GLuint id)
 	creating_entity->tex = tex->textureId;
 	if (creating_entity->tex == NULL)
 		return;
-	creating_entity->scale.x = 1;
-	creating_entity->scale.y = 1;
 	creating_entity->size.x = tex->w;
 	creating_entity->size.y = tex->h;
 }
@@ -215,8 +211,6 @@ void Attack()
 		static_entities.push_back(creating_entity);
 		creating_entity = new static_entity();
 		creating_entity->tex = tex->textureId;
-		creating_entity->scale.x = 1;
-		creating_entity->scale.y = 1;
 		creating_entity->size.x = tex->w;
 		creating_entity->size.y = tex->h;
 	}
@@ -243,11 +237,11 @@ void Game_Render()
 {
 	for (unsigned int i = 0; i < static_entities.size(); i++)
 	{
-		Texture_Draw(static_entities.at(i)->tex, static_entities.at(i)->size.x, static_entities.at(i)->size.y, static_entities.at(i)->scale.x, static_entities.at(i)->scale.y, static_entities.at(i)->position.x, static_entities.at(i)->position.y, editing);
+		Texture_Draw(static_entities.at(i)->tex, static_entities.at(i)->size.x, static_entities.at(i)->size.y, static_entities.at(i)->position.x, static_entities.at(i)->position.y, editing);
 	}
 	if (creating_entity != NULL)
 	{
-		Texture_Draw(creating_entity->tex, creating_entity->size.x, creating_entity->size.y, creating_entity->scale.x, creating_entity->scale.y, mouseX, mouseY, editing);
+		Texture_Draw(creating_entity->tex, creating_entity->size.x, creating_entity->size.y, mouseX, mouseY, editing);
 	}
 }
 
@@ -261,8 +255,8 @@ void Game_Mouse_Wheel(int value)
 {
 	if (editing)
 	{
-		creating_entity->scale.x += (value * creating_entity->scale.x / 10.0f);
-		creating_entity->scale.y += (value * creating_entity->scale.y / 10.0f);
+		creating_entity->size.x += (value * creating_entity->size.x / 10.0f);
+		creating_entity->size.y += (value * creating_entity->size.y / 10.0f);
 	}
 	else
 	{

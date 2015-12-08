@@ -107,6 +107,10 @@ event Event_Get();
 
 void Entity_Update(dynamic_entity *ent);
 
+/*COLLISION*/
+
+bool Collision_AABB_Entity(entity* ent1, entity* ent2);
+
 #ifndef SERVER
 
 /*CLIENT*/
@@ -142,7 +146,7 @@ void Game_Map_Change_Texture(GLuint id);
 
 /*TEXTURE*/
 
-void Texture_Draw(GLuint tex, float w, float h, float size_w, float size_h, float x, float y, int debug);
+void Texture_Draw(GLuint tex, float w, float h, float x, float y, int debug);
 GLuint Texture_Load(char* nameFile);
 texture_t* Texture_Get(unsigned int id);
 void Texture_Unload_All();
