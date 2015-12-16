@@ -2,8 +2,8 @@
 #include <vector>
 #include <fcntl.h>
 
-std::vector<static_entity*> static_entities;
-std::vector<dynamic_entity*> dynamic_entities;
+static std::vector<static_entity*> static_entities;
+static std::vector<dynamic_entity*> dynamic_entities;
 static_entity* creating_entity;
 GLuint actual_texture;
 bool editing;
@@ -69,7 +69,7 @@ void Game_Save_Map()
 				list_textures[tex->name] = count_textures++;
 			}
 
-			static_entity ent;
+			static_entity ent(0);
 			ent.id = i;
 			ent.position = static_entities.at(i)->position;
 			ent.size = static_entities.at(i)->size;
@@ -88,7 +88,7 @@ void Game_Save_Map()
 		*/
 
 		write(f, &version, sizeof(int));
-		write(f, "Faille du temps\0", sizeof(char) * 64);
+		write(f, "Faille du temps", sizeof(char) * 64);
 		write(f, &count_textures, sizeof(unsigned int));
 		for (std::map<char*, unsigned int>::iterator it = list_textures.begin(); it != list_textures.end(); it++)
 		{
@@ -146,7 +146,7 @@ void Game_Load_Map(char* mapName)
 	read(f, &count_entities, sizeof(unsigned int));
 	for (unsigned int i = 0; i < count_entities; i++)
 	{
-		static_entity *ent = new static_entity;
+		static_entity *ent = new static_entity(0);
 		read(f, ent, sizeof(static_entity));
 		ent->tex = texture_map[ent->tex];
 		static_entities.push_back(ent);
@@ -162,7 +162,7 @@ void Game_Toggle_Editor()
 	{
 		Print("Editor mode activated");
 		editing = true;
-		creating_entity = new static_entity();
+		creating_entity = new static_entity(0);
 	}
 	else
 	{
@@ -209,10 +209,19 @@ void Attack()
 		creating_entity->position.x = mouseX;
 		creating_entity->position.y = mouseY;
 		static_entities.push_back(creating_entity);
-		creating_entity = new static_entity();
+		creating_entity = new static_entity(0);
 		creating_entity->tex = tex->textureId;
 		creating_entity->size.x = tex->w;
 		creating_entity->size.y = tex->h;
+	}
+	else if (!editing && map_opened)
+	{
+		dynamic_entity* ent1 = new dynamic_entity(0);
+		ent1->position.x = mouseX;
+		ent1->position.y = mouseY;
+		ent1->size.x = 50;
+		ent1->size.y = 100;
+		dynamic_entities.push_back(ent1);
 	}
 }
 
@@ -230,7 +239,17 @@ void Game_Init()
 
 void Game_Update_World(int actualTime, int lastTime)
 {
+	float normalX, normalY;
 	Client_S2C();
+	for (unsigned int i = 0; i < dynamic_entities.size(); i++)
+	{
+		Entity_Update(dynamic_entities.at(i), actualTime - lastTime);
+
+		for (unsigned int j = 0; j < static_entities.size(); j++)
+		{
+			Entity_Resolve_Collision(dynamic_entities.at(i), static_entities.at(j));
+		}
+	}
 }
 
 void Game_Render()
@@ -239,10 +258,36 @@ void Game_Render()
 	{
 		Texture_Draw(static_entities.at(i)->tex, static_entities.at(i)->size.x, static_entities.at(i)->size.y, static_entities.at(i)->position.x, static_entities.at(i)->position.y, editing);
 	}
+
+	for (unsigned int i = 0; i < dynamic_entities.size(); i++)
+	{
+		glLoadIdentity();
+		glOrtho(0, 800, 600, 0, 0, 100);
+		glTranslatef(dynamic_entities.at(i)->position.x, dynamic_entities.at(i)->position.y, 0);
+		glColor3f(1.0f, 1.0f, 1.0f);
+		glBegin(GL_LINES);
+		glVertex3f(dynamic_entities.at(i)->size.x, 0, 0.0f);
+		glVertex3f(0, 0, 0.0f);
+		glEnd();
+		glBegin(GL_LINES);
+		glVertex3f(0, 0, 0.0f);
+		glVertex3f(0, dynamic_entities.at(i)->size.y, 0.0f);
+		glEnd();
+		glBegin(GL_LINES);
+		glVertex3f(0, dynamic_entities.at(i)->size.y, 0.0f);
+		glVertex3f(dynamic_entities.at(i)->size.x, dynamic_entities.at(i)->size.y, 0.0f);
+		glEnd();
+		glBegin(GL_LINES);
+		glVertex3f(dynamic_entities.at(i)->size.x, dynamic_entities.at(i)->size.y, 0.0f);
+		glVertex3f(dynamic_entities.at(i)->size.x, 0, 0.0f);
+		glEnd();
+	}
+
 	if (creating_entity != NULL)
 	{
 		Texture_Draw(creating_entity->tex, creating_entity->size.x, creating_entity->size.y, mouseX, mouseY, editing);
 	}
+
 }
 
 void Game_Mouse_Move(int x, int y)
@@ -260,6 +305,5 @@ void Game_Mouse_Wheel(int value)
 	}
 	else
 	{
-
 	}
 }

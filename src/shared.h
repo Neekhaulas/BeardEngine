@@ -39,6 +39,20 @@ typedef unsigned long long uint64;
 class vec
 {
 public:
+	vec()
+	{
+		x = 0;
+		y = 0;
+		z = 0;
+	}
+
+	vec(float x = 0.0f, float y = 0.0f, float z = 0.0f)
+	{
+		this->x = x;
+		this->y = y;
+		this->z = z;
+	}
+
 	float x;
 	float y;
 	float z;
@@ -122,6 +136,7 @@ typedef struct
 class entity
 {
 public:
+	entity(int _id) : id(_id), position(0, 0), size(0, 0), origin(0, 0) {};
 	int id;
 	vec position;
 	vec size;
@@ -132,11 +147,13 @@ public:
 class static_entity : public entity
 {
 public:
+	static_entity(int id) : entity(id) {};
 };
 
 class dynamic_entity : public entity
 {
 public:
+	dynamic_entity(int id) : applyGravity(true), collide(true), velocity(0, 0), gravity(0, 0), entity(id){};
 	vec velocity;
 	vec gravity;
 	bool applyGravity;

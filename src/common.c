@@ -48,6 +48,11 @@ char* CopyString(const char* str)
 	return (char*)cpy;
 }
 
+void Clamp(float& value, float min, float max)
+{
+	value = value < min ? min : (value > max ? max : value);
+}
+
 #ifndef SERVER
 
 void Shutdown()
@@ -69,7 +74,7 @@ int Init(char* command)
 
 	Cvar_Set("developer", "1", CVAR_READ_ONLY, "If the developper mod is on");
 	Cvar_Set("s_masterserver", MASTERSERVER, CVAR_READ_ONLY, "Address of the master server");
-	Cvar_Set("g_gravity", "800", CVAR_CHEATS, "Gravity of the game");
+	Cvar_Set("g_gravity", "4", CVAR_CHEATS, "Gravity of the game");
 
 	char* date = __DATE__;
 	char version_str[256];

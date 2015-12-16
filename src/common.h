@@ -34,6 +34,7 @@ char* CopyString(const char* str);
 void Game_Frame();
 void Input_Frame();
 void Quit();
+void Clamp(float& value, float min, float max);
 
 /*
 CONSOLE
@@ -105,11 +106,13 @@ event Event_Get();
 
 /*ENTITY*/
 
-void Entity_Update(dynamic_entity *ent);
+void Entity_Update(dynamic_entity *ent, int delta);
+void Entity_Resolve_Collision(dynamic_entity *ent1, entity *ent2);
 
 /*COLLISION*/
 
 bool Collision_AABB_Entity(entity* ent1, entity* ent2);
+bool Collision_AABB_Entity_Offset(entity* ent1, entity* ent2, float& moveX, float& moveY);
 
 #ifndef SERVER
 
