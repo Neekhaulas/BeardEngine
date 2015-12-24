@@ -14,7 +14,7 @@ int mouseY;
 
 void Game_New_Map()
 {
-	Print("New map");
+	Game_Reset_Map();
 	if (Command_Argc() != 2)
 	{
 		Print("usage : newmap <mapname>");
@@ -26,7 +26,6 @@ void Game_New_Map()
 	char* fileName = (char*)malloc(sizeof(char) * 256);
 	char* file = (char*)malloc(sizeof(char) * 256);
 	int size;
-	actual_texture = 1;
 	Print("Loading all textures");
 	fscanf(list, "%d", &size);
 	for (int i = 0; i < size; i++)
@@ -45,6 +44,7 @@ void Game_Reset_Map()
 	map_name = NULL;
 	Texture_Unload_All();
 	static_entities.clear();
+	dynamic_entities.clear();
 }
 
 void Game_Save_Map()
@@ -163,6 +163,8 @@ void Game_Toggle_Editor()
 		Print("Editor mode activated");
 		editing = true;
 		creating_entity = new static_entity(0);
+		actual_texture = 1;
+		Game_Map_Change_Texture(actual_texture);
 	}
 	else
 	{
@@ -177,6 +179,7 @@ void Game_Map_Change_Texture(GLuint id)
 {
 	texture_t* tex;
 	tex = Texture_Get(id);
+
 	creating_entity->tex = tex->textureId;
 	if (creating_entity->tex == NULL)
 		return;
@@ -189,7 +192,6 @@ void Texture_Next()
 	if (!editing)
 		return;
 	Game_Map_Change_Texture(++actual_texture);
-	Print("Next texture : %d", actual_texture);
 }
 
 void Texture_Prev()
@@ -197,7 +199,6 @@ void Texture_Prev()
 	if (!editing)
 		return;
 	Game_Map_Change_Texture(--actual_texture);
-	Print("Prev texture : %d", actual_texture);
 }
 
 void Attack()
@@ -239,7 +240,6 @@ void Game_Init()
 
 void Game_Update_World(int actualTime, int lastTime)
 {
-	float normalX, normalY;
 	Client_S2C();
 	for (unsigned int i = 0; i < dynamic_entities.size(); i++)
 	{

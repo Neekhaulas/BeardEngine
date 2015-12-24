@@ -163,6 +163,26 @@ public:
 };
 
 /*
+============= UNIT ====================
+*/
+
+class unit : public dynamic_entity
+{
+
+};
+
+/*
+============= PLAYER ==================
+*/
+
+class character : public unit
+{
+public:
+	character(int id) : {};
+	int idCharacter;
+};
+
+/*
 ============= COLLISION ===============
 */
 

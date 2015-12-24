@@ -11,7 +11,7 @@ void Entity_Update(dynamic_entity *ent, int delta)
 
 void Entity_Resolve_Collision(dynamic_entity *ent1, entity *ent2)
 {
-	/*float x, y;
+	float x, y;
 
 	if (Collision_AABB_Entity_Offset(ent1, ent2, x, y))
 	{
@@ -26,7 +26,7 @@ void Entity_Resolve_Collision(dynamic_entity *ent1, entity *ent2)
 			ent1->velocity.y = 0;
 			ent1->position.y += y;
 		}
-	}*/
+	}
 
 	ent1->position.x += ent1->velocity.x;
 	ent1->position.y += ent1->velocity.y;
