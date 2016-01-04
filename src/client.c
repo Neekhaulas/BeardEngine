@@ -3,7 +3,7 @@
 #include "client_input.h"
 #include "packets.h"
 
-#ifndef DEDICATED
+#ifndef SERVER
 
 ENetHost *hostClient = NULL;
 ENetPeer *peerClient = NULL;
@@ -95,9 +95,12 @@ void Client_S2C()
 		switch (event.type)
 		{
 		case ENET_EVENT_TYPE_CONNECT:
+		{
 			connecting = false;
 			connected = true;
+			Client_Send_Request_Connect();
 			Print("Connected");
+		}
 			break;
 		case ENET_EVENT_TYPE_RECEIVE:
 			Client_Handle_Packet(event.channelID, event.packet);
@@ -112,10 +115,33 @@ void Client_S2C()
 	}
 }
 
+void Client_Send_Request_Connect()
+{
+	PacketChecking packet = PacketChecking();
+	packet.version = VERSION;
+	packet.idUser = 123456;
+	Client_Send(reinterpret_cast<uint8 *>(&packet), sizeof(packet), CHL_C2S, ENET_PACKET_FLAG_RELIABLE);
+}
+
 void Client_Handle_Packet(enet_uint8 chanel, ENetPacket* packet)
 {
 	PacketHeader *header = reinterpret_cast<PacketHeader*>(packet->data);
 	Print("Packet received on chanel %d with packet id %d", chanel, header->cmd);
+}
+
+void Client_Send(const uint8 *source, uint32 length, uint8 channelNo, uint32 flag)
+{
+	uint8* data = new uint8[length];
+	memcpy(data, source, length);
+
+	ENetPacket *packet = enet_packet_create(data, length, flag);
+	if (enet_peer_send(peerClient, channelNo, packet) < 0)
+	{
+		delete[] data;
+		Print_Error(1, "[NETWORK]Error while sending packet");
+	}
+
+	delete[] data;
 }
 
 void Client_Disconnect()

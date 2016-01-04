@@ -80,7 +80,7 @@ int Init(char* command)
 	char version_str[256];
 
 	Cvar_Set("dedicated", "0", CVAR_READ_ONLY, "If this is dedicated server");
-	sprintf(version_str, PRODUCT_NAME " client " VERSION " (%s)", date);
+	sprintf(version_str, PRODUCT_NAME " client 1 (%s)", date);
 	Cvar_Set("version", version_str, CVAR_READ_ONLY, "Version of the client");
 	Cvar_Set("width_screen", "1024", CVAR_USER_CREATED, NULL);
 	Cvar_Set("height_screen", "768", CVAR_USER_CREATED, NULL);

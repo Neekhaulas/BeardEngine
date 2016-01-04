@@ -7,12 +7,28 @@
 ENetHost *serverHost = NULL;
 Client* clients[PLAYER_PER_TEAM*2];
 int countClients = 0;
+bool waitingPlayers;
 
 Cvar* dedicated;
 Cvar* version;
 Cvar* developper;
 Cvar* s_masterserver;
 Cvar* g_gravity;
+
+bool is_in_game(int idUser)
+{
+	for (int i = 0; i < PLAYER_PER_TEAM * 2; i++)
+	{
+		if (clients[i] != NULL)
+		{
+			if (clients[i]->id == idUser)
+			{
+				return true;
+			}
+		}
+	}
+	return false;
+}
 
 void fatal_error(char* error)
 {
@@ -35,6 +51,7 @@ Client* add_client()
 		{
 			c = new Client;
 			c->clientNumber = i;
+			c->authed = false;
 			clients[i] = c;
 			return c;
 		}
@@ -86,7 +103,7 @@ void Server_Frame()
 		{
 			case ENET_EVENT_TYPE_CONNECT:
 			{
-				Print("Event : connect");
+				Print("Client connected, waiting for informations");
 				Client* c = add_client();
 				if (c == NULL)
 				{
@@ -95,13 +112,14 @@ void Server_Frame()
 					break;
 				}
 				c->peer = event.peer;
-				Server_Send_Infos(c->clientNumber);
+				c->peer->data = (void*)c->clientNumber;
 				break;
 			}
 
 			case ENET_EVENT_TYPE_RECEIVE:
 			{
 				Print("Event : packet");
+				Server_Handle_Packet(event.packet, (int)event.peer->data, event.channelID);
 				break;
 			}
 
@@ -118,21 +136,52 @@ void Server_Frame()
 	Server_Send_Game_State();
 }
 
+void Server_Handle_Packet(ENetPacket* packet, int client, int chan)
+{
+	Print("Received packet form %d on chan %d", client, chan);
+	PacketHeader *header = reinterpret_cast<PacketHeader*>(packet->data);
+
+	switch(header->cmd)
+	{
+	case C2S_CHECK:
+		PacketChecking *pkt = reinterpret_cast<PacketChecking*>(packet->data);
+		if (pkt->version != VERSION)
+		{
+			//Send packet wrong version
+		}
+
+		if (waitingPlayers)
+		{
+			if (is_in_game(pkt->idUser))
+			{
+				//Send packet already in game
+			}
+			clients[client]->id = pkt->idUser;
+			clients[client]->authed = true;
+			/* Send informations :
+			- Map
+			- Team
+			- How much players
+			*/
+		}
+		break;
+	}
+}
+
 bool Server_Init(int argc, char** argv)
 {
 	/*
 	Parser les arguments
 	*/
 	char* date = __DATE__;
-	char* version_str = (char*)malloc(strlen(PRODUCT_NAME " client " VERSION " (%s)") + 1);
+	char* version_str = (char*)malloc(strlen(PRODUCT_NAME " client 1 (%s)") + 1);
 	
 	dedicated = Cvar_Set("dedicated", "1", CVAR_READ_ONLY, "If this is dedicated server");
-	sprintf(version_str, PRODUCT_NAME " dedicated server " VERSION " (%s)", date);
-	version = Cvar_Set("version", version_str, CVAR_READ_ONLY, "Version of the client");
 
 	developper = Cvar_Set("developer", "1", CVAR_READ_ONLY, "If the developper mod is on");
-	s_masterserver = Cvar_Set("s_masterserver", MASTERSERVER, CVAR_READ_ONLY, "Address of the master server");
 	g_gravity = Cvar_Set("g_gravity", "800", CVAR_CHEATS, "Gravity of the game");
+
+	Command_Exec("exec server.cfg");
 
 	ENetAddress address;
 	address.host = ENET_HOST_ANY;
@@ -164,6 +213,13 @@ void Server_Cleanup(void)
 
 int main(int argc, char** argv)
 {
+	/*
+	Set mode
+	Load map
+	Wait for everyone
+	Wait for pick
+	Start
+	*/
 	if (enet_initialize() < 0)
 	{
 		fatal_error("Error while starting enet");

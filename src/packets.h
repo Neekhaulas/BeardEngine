@@ -10,6 +10,17 @@ public:
 	}
 };
 
+class PacketChecking : public PacketHeader
+{
+public:
+	PacketChecking() : PacketHeader(S2C_CHECK)
+	{
+
+	};
+	int version;
+	int idUser;
+};
+
 class PacketSync : public PacketHeader
 {
 
@@ -22,7 +33,6 @@ public:
 	{
 
 	}
-
 };
 
 #endif

@@ -28,7 +28,7 @@ void ParseArgs(int argc, char **argv)
       #ifdef DEDICATED
       fprintf(stdout, PRODUCT_NAME " dedicated server " VERSION " (%s)\n", date);
       #else
-      fprintf(stdout, PRODUCT_NAME " client " VERSION " (%s)\n", date);
+      fprintf(stdout, PRODUCT_NAME " client VERSION (%s)\n", date);
       #endif
     }
     exit(0);

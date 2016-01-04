@@ -8,10 +8,6 @@
 #endif
 #endif
 
-#include <gl/glew.h>
-#include <SDL_opengl.h>
-#include <gl/GLU.h>
-
 typedef char int8;
 typedef short int16;
 typedef int int32;
@@ -22,7 +18,7 @@ typedef unsigned int uint32;
 typedef unsigned long long uint64;
 
 #define PRODUCT_NAME "BeardEngine"
-#define VERSION "0.01"
+#define VERSION 1
 #define ERROR_LEVEL 1
 
 #define MASTERSERVER "be.grandebar.be"
@@ -141,7 +137,7 @@ public:
 	vec position;
 	vec size;
 	vec origin;
-	GLuint tex;
+	unsigned int tex;
 };
 
 class static_entity : public entity
@@ -178,7 +174,7 @@ class unit : public dynamic_entity
 class character : public unit
 {
 public:
-	character(int id) : {};
+	character(int id);
 	int idCharacter;
 };
 
@@ -192,6 +188,8 @@ public:
 
 enum PacketCmd {
 	C2S_COMMAND = 1,
+	S2C_CHECK = 2,
+	C2S_CHECK = 3,
 
 };
 
@@ -206,10 +204,6 @@ public:
 	int w;
 	int h;
 	char* name;
-	~texture_t(){
-		delete name;
-		glDeleteTextures(1, &textureId);
-	}
 };
 /*
 ============== KEY ====================

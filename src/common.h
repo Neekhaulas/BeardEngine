@@ -130,6 +130,7 @@ void Client_Cleanup();
 void Client_Abort_Connection();
 void Client_Handle_Packet(enet_uint8 chanel, ENetPacket* packet);
 void Client_Send(const uint8 *source, uint32 length, uint8 channelNo, uint32 flag);
+void Client_Send_Request_Connect();
 
 /*GAME*/
 
@@ -169,11 +170,14 @@ void Server_Send_Game_State();
 void Server_Send_Infos(int clientNumber);
 void Server_Disconnect_Player(int clientNumber, int reason);
 void Server_Send_To(ENetPeer* peer, const uint8 *source, uint32 length, uint8 channelNo, uint32 flag);
+void Server_Handle_Packet(ENetPacket* packet, int client, int chan);
 
 typedef struct _Client
 {
 	int clientNumber;
 	ENetPeer *peer;
+	bool authed;
+	int id;
 	int team;
 	int character;
 	int skin;
