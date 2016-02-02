@@ -1,6 +1,4 @@
-
-#ifndef __COMMON_H
-#define __COMMON_H
+#pragma once
 
 #include <stdio.h>
 #include <string>
@@ -8,8 +6,9 @@
 #include <enet/enet.h>
 #include <map>
 #include <vector>
-#include <zlib123/crc32.h>
 #include <physfs.h>
+#include <fcntl.h>
+#include <unistd.h>
 
 #include "shared.h"
 #include "keys.h"
@@ -19,9 +18,8 @@
 #include <SDL.h>
 #include <SDL_image.h>
 #include <SDL_mixer.h>
-#include <gl/glew.h>
+#include <GL/glew.h>
 #include <SDL_opengl.h>
-#include <gl/GLU.h>
 #endif
 
 /*
@@ -38,16 +36,6 @@ void Game_Frame();
 void Input_Frame();
 void Quit();
 void Clamp(float& value, float min, float max);
-
-/*
-CONSOLE
-*/
-
-#define	MAX_EDIT_LINE	256
-
-void Console_Print(char* msg);
-void Console_Init();
-void Console_Frame();
 
 /*CVAR*/
 
@@ -184,5 +172,3 @@ Client* Server_Get_Client(int client);
 
 enum {DISCONNECT = 0, DISCONNECT_NOTAUTH, DISCONNECT_MAXCLIENTS, DISCONNECT_AFK, DISCONNECT_CHEAT, DISCONNECT_WRONG_VERSION};
 enum {CHL_S2C = 1, CHL_C2S};
-
-#endif

@@ -64,7 +64,7 @@ class PacketSnapshot : public PacketHeader
 {
 public:
 	PacketSnapshot() : PacketHeader(S2C_SNAPSHOT) {};
-	snapshot snapshot;
+	snapshot s;
 };
 
 #endif

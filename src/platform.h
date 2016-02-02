@@ -10,9 +10,14 @@
 #define read _read
 #define close _close
 
+#define O_BINARY _O_BINARY
+#define O_RDONLY _O_RDONLY
+
 #define vsprintf vsprintf_s
 #define sprintf sprintf_s
 
+#else
+#define O_BINARY 0
 #endif
 
 #endif

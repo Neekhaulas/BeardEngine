@@ -97,7 +97,7 @@ struct _Cvar
 ============== ENTITY =============
 */
 
-typedef enum
+typedef enum entityType
 {
 	ET_GENERAL,
 	ET_PLAYER,
@@ -140,7 +140,7 @@ typedef struct
 class entity
 {
 public:
-	entity() : id(0), position(0, 0), size(0, 0), origin(0, 0), type(entityType::ET_GENERAL) {};
+	entity() : id(0), position(0, 0), size(0, 0), origin(0, 0), type(ET_GENERAL) {};
 	entity(int _id, entityType _type) : id(_id), position(0, 0), size(0, 0), origin(0, 0), type(_type) {};
 	int id;
 	entityType type;
@@ -153,7 +153,7 @@ public:
 class static_entity : public entity
 {
 public:
-	static_entity() : entity(0, entityType::ET_GENERAL) {};
+	static_entity() : entity(0, ET_GENERAL) {};
 };
 
 class dynamic_entity : public entity
@@ -277,7 +277,7 @@ public:
 	bool authed;
 	int id;
 	int team;
-	character *character;
+	character *c;
 	int idCharacter;
 	int skin;
 	int ping;
