@@ -92,7 +92,11 @@ int main (int argc, char **argv)
 		handle_input();
 		Event_Loop();
 		int time = SDL_GetTicks();
-		Game_Update_World(time, lastTime);
+		Game_Frame(time, lastTime);
+
+		Client_S2C();
+		Client_Send_Input(time);
+
 		Render_Draw_Frame();
 		lastTime = time;
 	}

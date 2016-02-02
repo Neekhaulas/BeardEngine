@@ -7,6 +7,9 @@
 #include <stdlib.h>
 #include <enet/enet.h>
 #include <map>
+#include <vector>
+#include <zlib123/crc32.h>
+#include <physfs.h>
 
 #include "shared.h"
 #include "keys.h"
@@ -108,6 +111,7 @@ event Event_Get();
 
 void Entity_Update(dynamic_entity *ent, int delta);
 void Entity_Resolve_Collision(dynamic_entity *ent1, entity *ent2);
+double Entity_Distance(entity *ent1, entity *ent2);
 
 /*COLLISION*/
 
@@ -131,22 +135,8 @@ void Client_Abort_Connection();
 void Client_Handle_Packet(enet_uint8 chanel, ENetPacket* packet);
 void Client_Send(const uint8 *source, uint32 length, uint8 channelNo, uint32 flag);
 void Client_Send_Request_Connect();
-
-/*GAME*/
-
-void Game_Init();
-void Game_Update_World(int actualTime, int lastTime);
-void Game_Reset_Map();
-void Game_Load_Map(char* mapName);
-void Game_New_Map();
-void Game_Save_Map();
-void Game_Render();
-void Game_Mouse_Move(int x, int y);
-void Game_Mouse_Wheel(int value);
-
-//This methods are callable only in map editor
-
-void Game_Map_Change_Texture(GLuint id);
+void Client_Send_Input(int actualTime);
+//void Client_Unpack_Snapshot(snapshot s);
 
 /*TEXTURE*/
 
@@ -161,6 +151,20 @@ bool Render_InitGL();
 void Render_Draw_Frame();
 #endif
 
+/*GAME*/
+
+void Game_Init();
+void Game_Update_World(int actualTime, int lastTime);
+void Game_Reset_Map();
+void Game_Load_Map(char* mapName);
+void Game_Render();
+void Game_Mouse_Move(int x, int y);
+void Game_Mouse_Wheel(int value);
+std::vector<dynamic_entity*> Game_Get_Entities();
+void Game_Frame(int time, int lastTime);
+void Game_Start();
+bool Game_Is_Started();
+
 /*SERVER*/
 
 bool Server_Init(int argc, char** argv);
@@ -170,21 +174,15 @@ void Server_Send_Game_State();
 void Server_Send_Infos(int clientNumber);
 void Server_Disconnect_Player(int clientNumber, int reason);
 void Server_Send_To(ENetPeer* peer, const uint8 *source, uint32 length, uint8 channelNo, uint32 flag);
-void Server_Handle_Packet(ENetPacket* packet, int client, int chan);
+void Server_Handle_Packet(ENetPacket* packet, ENetPeer* peer, int client, int chan);
+void Server_Send_Game_Infos(ENetPeer* peer, int team);
+void Server_Send_Waiting_For_Start(ENetPeer* peer);
+void Server_Think();
+void Server_Make_Snapshot(Client *client, int actualTime);
+int Server_Count_Client();
+Client* Server_Get_Client(int client);
 
-typedef struct _Client
-{
-	int clientNumber;
-	ENetPeer *peer;
-	bool authed;
-	int id;
-	int team;
-	int character;
-	int skin;
-	int ping;
-} Client;
-
-enum {DISCONNECT = 0, DISCONNECT_NOTAUTH, DISCONNECT_MAXCLIENTS, DISCONNECT_AFK, DISCONNECT_CHEAT};
+enum {DISCONNECT = 0, DISCONNECT_NOTAUTH, DISCONNECT_MAXCLIENTS, DISCONNECT_AFK, DISCONNECT_CHEAT, DISCONNECT_WRONG_VERSION};
 enum {CHL_S2C = 1, CHL_C2S};
 
 #endif

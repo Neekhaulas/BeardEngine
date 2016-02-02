@@ -1,53 +1,92 @@
 #include "common.h"
-#include <vector>
 #include <fcntl.h>
+#include "hero.h"
 
-static std::vector<static_entity*> static_entities;
-static std::vector<dynamic_entity*> dynamic_entities;
-static_entity* creating_entity;
-GLuint actual_texture;
-bool editing;
+std::vector<static_entity*> static_entities;
+std::vector<dynamic_entity*> dynamic_entities;
 bool map_opened;
 char* map_name;
 int mouseX;
 int mouseY;
+int id(0);
+bool gameStarted(false);
 
-void Game_New_Map()
+bool Game_Is_Started()
 {
-	Game_Reset_Map();
-	if (Command_Argc() != 2)
+	return gameStarted;
+}
+
+std::vector<dynamic_entity*> Game_Get_Entities()
+{
+	return dynamic_entities;
+}
+
+void Game_Frame(int time, int lastTime)
+{
+	Game_Update_World(time, lastTime);
+}
+
+void Game_Init()
+{
+	map_opened = false;
+	id = 0;
+	Hero hero;
+	int test = open("test.hero", _O_RDONLY | _O_BINARY);
+	if (test > 0)
 	{
-		Print("usage : newmap <mapname>");
-		return;
+		read(test, &hero, sizeof(Hero));
+		close(test);
+		Print("Test : %f", hero.getAD());
 	}
-	map_name = Command_Argv(1);
-	FILE* list;
-	list = fopen("data/textures/textures.txt", "r");
-	char* fileName = (char*)malloc(sizeof(char) * 256);
-	char* file = (char*)malloc(sizeof(char) * 256);
-	int size;
-	Print("Loading all textures");
-	fscanf(list, "%d", &size);
-	for (int i = 0; i < size; i++)
+}
+
+bool Game_Entity_Exists(int id)
+{
+	for (int i = 0; i < dynamic_entities.size(); i++)
 	{
-		fscanf(list, "%s", fileName);
-		_snprintf(file, 256, "data/textures/%s", fileName);
-		Texture_Load(file);
+		if (dynamic_entities.at(i)->id == id)
+		{
+			return true;
+		}
 	}
-	fclose(list);
-	map_opened = true;
+	return false;
+}
+int test;
+void Game_Update_World(int actualTime, int lastTime)
+{
+#ifdef SERVER
+	Server_Think();
+
+	if (actualTime - test > 1000)
+	{
+		dynamic_entities.push_back(new dynamic_entity(++id, ET_GENERAL));
+		Print("New entity");
+		test = actualTime;
+	}
+#endif
+	
+	//Game_Update_Physics();
+}
+
+#ifdef SERVER
+void Game_Start()
+{
+	for (int i = 0; i < Server_Count_Client(); i++)
+	{
+		Server_Get_Client(i)->character = new character(i);
+	}
+	gameStarted = true;
 }
 
 void Game_Reset_Map()
 {
 	map_opened = false;
 	map_name = NULL;
-	Texture_Unload_All();
 	static_entities.clear();
 	dynamic_entities.clear();
 }
 
-void Game_Save_Map()
+/*void Game_Save_Map()
 {
 	texture_t* tex;
 	int f;
@@ -85,7 +124,7 @@ void Game_Save_Map()
 		- All the names of textures
 		- Number of entities
 		- All the entities
-		*/
+		
 
 		write(f, &version, sizeof(int));
 		write(f, "Faille du temps", sizeof(char) * 64);
@@ -107,6 +146,99 @@ void Game_Save_Map()
 		return;
 	}
 	Print("Impossible d'ouvrir le ficher %s", map_name);
+}*/
+
+void Game_Load_Map(char* mapName)
+{
+	Game_Reset_Map();
+	Print("Loading map : %s", mapName);
+	map_name = mapName;
+	int f = open(mapName, _O_BINARY | _O_RDONLY);
+
+	int version;
+	char name[64];
+	unsigned int count_entities;
+	unsigned int count_textures;
+
+	if (f == -1)
+	{
+		Print("Cannot open %s", mapName);
+		return;
+	}
+
+	read(f, &version, sizeof(int));
+	read(f, name, sizeof(char) * 64);
+	read(f, &count_textures, sizeof(unsigned int));
+
+	read(f, &count_entities, sizeof(unsigned int));
+	for (unsigned int i = 0; i < count_entities; i++)
+	{
+		static_entity *ent = new static_entity();
+		read(f, ent, sizeof(static_entity));
+		static_entities.push_back(ent);
+	}
+	close(f);
+
+	map_opened = true;
+}
+
+void Attack()
+{
+
+}
+
+#else
+
+void Game_Render()
+{
+	for (unsigned int i = 0; i < static_entities.size(); i++)
+	{
+		Texture_Draw(static_entities.at(i)->tex, static_entities.at(i)->size.x, static_entities.at(i)->size.y, static_entities.at(i)->position.x, static_entities.at(i)->position.y, 0);
+	}
+
+	for (unsigned int i = 0; i < dynamic_entities.size(); i++)
+	{
+		glLoadIdentity();
+		glOrtho(0, 800, 600, 0, 0, 100);
+		glTranslatef(dynamic_entities.at(i)->position.x, dynamic_entities.at(i)->position.y, 0);
+		glColor3f(1.0f, 1.0f, 1.0f);
+		glBegin(GL_LINES);
+		glVertex3f(dynamic_entities.at(i)->size.x, 0, 0.0f);
+		glVertex3f(0, 0, 0.0f);
+		glEnd();
+		glBegin(GL_LINES);
+		glVertex3f(0, 0, 0.0f);
+		glVertex3f(0, dynamic_entities.at(i)->size.y, 0.0f);
+		glEnd();
+		glBegin(GL_LINES);
+		glVertex3f(0, dynamic_entities.at(i)->size.y, 0.0f);
+		glVertex3f(dynamic_entities.at(i)->size.x, dynamic_entities.at(i)->size.y, 0.0f);
+		glEnd();
+		glBegin(GL_LINES);
+		glVertex3f(dynamic_entities.at(i)->size.x, dynamic_entities.at(i)->size.y, 0.0f);
+		glVertex3f(dynamic_entities.at(i)->size.x, 0, 0.0f);
+		glEnd();
+	}
+}
+
+void Game_Mouse_Move(int x, int y)
+{
+	mouseX = x;
+	mouseY = y;
+}
+
+void Game_Mouse_Wheel(int value)
+{
+
+}
+
+void Game_Reset_Map()
+{
+	map_opened = false;
+	map_name = NULL;
+	Texture_Unload_All();
+	static_entities.clear();
+	dynamic_entities.clear();
 }
 
 void Game_Load_Map(char* mapName)
@@ -146,7 +278,7 @@ void Game_Load_Map(char* mapName)
 	read(f, &count_entities, sizeof(unsigned int));
 	for (unsigned int i = 0; i < count_entities; i++)
 	{
-		static_entity *ent = new static_entity(0);
+		static_entity *ent = new static_entity();
 		read(f, ent, sizeof(static_entity));
 		ent->tex = texture_map[ent->tex];
 		static_entities.push_back(ent);
@@ -156,154 +288,5 @@ void Game_Load_Map(char* mapName)
 	map_opened = true;
 }
 
-void Game_Toggle_Editor()
-{
-	if (!editing)
-	{
-		Print("Editor mode activated");
-		editing = true;
-		creating_entity = new static_entity(0);
-		actual_texture = 1;
-		Game_Map_Change_Texture(actual_texture);
-	}
-	else
-	{
-		Print("Editor mode deactivated");
-		delete creating_entity;
-		creating_entity = NULL;
-		editing = false;
-	}
-}
 
-void Game_Map_Change_Texture(GLuint id)
-{
-	texture_t* tex;
-	tex = Texture_Get(id);
-
-	creating_entity->tex = tex->textureId;
-	if (creating_entity->tex == NULL)
-		return;
-	creating_entity->size.x = tex->w;
-	creating_entity->size.y = tex->h;
-}
-
-void Texture_Next()
-{
-	if (!editing)
-		return;
-	Game_Map_Change_Texture(++actual_texture);
-}
-
-void Texture_Prev()
-{
-	if (!editing)
-		return;
-	Game_Map_Change_Texture(--actual_texture);
-}
-
-void Attack()
-{
-	if (editing && map_opened)
-	{
-		texture_t* tex;
-		tex = Texture_Get(actual_texture);
-		creating_entity->position.x = mouseX;
-		creating_entity->position.y = mouseY;
-		static_entities.push_back(creating_entity);
-		creating_entity = new static_entity(0);
-		creating_entity->tex = tex->textureId;
-		creating_entity->size.x = tex->w;
-		creating_entity->size.y = tex->h;
-	}
-	else if (!editing && map_opened)
-	{
-		dynamic_entity* ent1 = new dynamic_entity(0);
-		ent1->position.x = mouseX;
-		ent1->position.y = mouseY;
-		ent1->size.x = 50;
-		ent1->size.y = 100;
-		dynamic_entities.push_back(ent1);
-	}
-}
-
-void Game_Init()
-{
-	editing = false;
-	map_opened = false;
-	Command_Add("texture_next", Texture_Next);
-	Command_Add("texture_prev", Texture_Prev);
-	Command_Add("toggle_editor", Game_Toggle_Editor);
-	Command_Add("newmap", Game_New_Map);
-	Command_Add("savemap", Game_Save_Map);
-	Command_Add("+attack", Attack);
-}
-
-void Game_Update_World(int actualTime, int lastTime)
-{
-	Client_S2C();
-	for (unsigned int i = 0; i < dynamic_entities.size(); i++)
-	{
-		Entity_Update(dynamic_entities.at(i), actualTime - lastTime);
-
-		for (unsigned int j = 0; j < static_entities.size(); j++)
-		{
-			Entity_Resolve_Collision(dynamic_entities.at(i), static_entities.at(j));
-		}
-	}
-}
-
-void Game_Render()
-{
-	for (unsigned int i = 0; i < static_entities.size(); i++)
-	{
-		Texture_Draw(static_entities.at(i)->tex, static_entities.at(i)->size.x, static_entities.at(i)->size.y, static_entities.at(i)->position.x, static_entities.at(i)->position.y, editing);
-	}
-
-	for (unsigned int i = 0; i < dynamic_entities.size(); i++)
-	{
-		glLoadIdentity();
-		glOrtho(0, 800, 600, 0, 0, 100);
-		glTranslatef(dynamic_entities.at(i)->position.x, dynamic_entities.at(i)->position.y, 0);
-		glColor3f(1.0f, 1.0f, 1.0f);
-		glBegin(GL_LINES);
-		glVertex3f(dynamic_entities.at(i)->size.x, 0, 0.0f);
-		glVertex3f(0, 0, 0.0f);
-		glEnd();
-		glBegin(GL_LINES);
-		glVertex3f(0, 0, 0.0f);
-		glVertex3f(0, dynamic_entities.at(i)->size.y, 0.0f);
-		glEnd();
-		glBegin(GL_LINES);
-		glVertex3f(0, dynamic_entities.at(i)->size.y, 0.0f);
-		glVertex3f(dynamic_entities.at(i)->size.x, dynamic_entities.at(i)->size.y, 0.0f);
-		glEnd();
-		glBegin(GL_LINES);
-		glVertex3f(dynamic_entities.at(i)->size.x, dynamic_entities.at(i)->size.y, 0.0f);
-		glVertex3f(dynamic_entities.at(i)->size.x, 0, 0.0f);
-		glEnd();
-	}
-
-	if (creating_entity != NULL)
-	{
-		Texture_Draw(creating_entity->tex, creating_entity->size.x, creating_entity->size.y, mouseX, mouseY, editing);
-	}
-
-}
-
-void Game_Mouse_Move(int x, int y)
-{
-	mouseX = x;
-	mouseY = y;
-}
-
-void Game_Mouse_Wheel(int value)
-{
-	if (editing)
-	{
-		creating_entity->size.x += (value * creating_entity->size.x / 10.0f);
-		creating_entity->size.y += (value * creating_entity->size.y / 10.0f);
-	}
-	else
-	{
-	}
-}
+#endif

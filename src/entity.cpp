@@ -31,3 +31,8 @@ void Entity_Resolve_Collision(dynamic_entity *ent1, entity *ent2)
 	ent1->position.x += ent1->velocity.x;
 	ent1->position.y += ent1->velocity.y;
 }
+
+double Entity_Distance(entity *ent1, entity *ent2)
+{
+	return sqrt((ent1->position.x - ent2->position.x)*(ent1->position.x - ent2->position.x) + (ent1->position.y - ent2->position.y)*(ent1->position.y - ent2->position.y));
+}

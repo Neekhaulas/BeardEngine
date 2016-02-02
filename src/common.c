@@ -59,11 +59,34 @@ void Shutdown()
 {
 	SDL_Quit();
 	Client_Cleanup();
+	PHYSFS_deinit();
 	exit(0);
 }
 
 int Init(char* command)
 {
+	PHYSFS_init(NULL);
+	/*if (PHYSFS_addToSearchPath("data/textures.be", 1) == 0)
+	{
+		Print("Cannot load textures...");
+		return 1;
+	}
+	if (PHYSFS_addToSearchPath("data/heroes.be", 1) == 0)
+	{
+		Print("Cannot load heroes...");
+		return 1;
+	}
+	if (PHYSFS_addToSearchPath("data/sounds.be", 1) == 0)
+	{
+		Print("Cannot load sounds...");
+		return 1;
+	}
+	if (PHYSFS_addToSearchPath("data/musics.be", 1) == 0)
+	{
+		Print("Cannot load musics...");
+		return 1;
+	}*/
+
 	Cvar_Init();
 
 	Command_Init();

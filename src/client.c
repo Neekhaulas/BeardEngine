@@ -9,8 +9,21 @@ ENetHost *hostClient = NULL;
 ENetPeer *peerClient = NULL;
 int connectionAttemps = 0;
 unsigned int timeoutTimer = 0;
+unsigned int inputSent = 0;
 bool connecting = false, connected = false;
 
+void Client_Send_Input(int actualTime)
+{
+	if (!connected)
+		return;
+	if (actualTime - inputSent > 33)
+	{
+		//Send input
+		PacketInput pkt = PacketInput();
+		Client_Send(reinterpret_cast<uint8*>(&pkt), sizeof(PacketInput), CHL_C2S, ENET_PACKET_FLAG_RELIABLE);
+		inputSent = actualTime;
+	}
+}
 
 void Client_Init()
 {
@@ -108,7 +121,9 @@ void Client_S2C()
 			break;
 
 		case ENET_EVENT_TYPE_DISCONNECT:
-			printf("%s disconnected.\n", event.peer->data);
+			Print("Connection lost.\n", event.peer->data);
+			connected = false;
+			connecting = false;
 			/* Reset the peer's client information. */
 			event.peer->data = NULL;
 		}
@@ -121,16 +136,46 @@ void Client_Send_Request_Connect()
 	packet.version = VERSION;
 	packet.idUser = 123456;
 	Client_Send(reinterpret_cast<uint8 *>(&packet), sizeof(packet), CHL_C2S, ENET_PACKET_FLAG_RELIABLE);
+	Print("Sending request");
 }
 
 void Client_Handle_Packet(enet_uint8 chanel, ENetPacket* packet)
 {
 	PacketHeader *header = reinterpret_cast<PacketHeader*>(packet->data);
-	Print("Packet received on chanel %d with packet id %d", chanel, header->cmd);
+	switch (header->cmd)
+	{
+	case S2C_GAMEINFOS:
+	{
+		PacketSendGameInfos *pkt = reinterpret_cast<PacketSendGameInfos*>(packet->data);
+
+		delete pkt;
+	}
+		break;
+
+	case S2C_WAITFORSTART:
+		Print("Waiting for game starting...");
+		break;
+
+	case S2C_SNAPSHOT:
+	{
+		PacketSnapshot *pkt = reinterpret_cast<PacketSnapshot*>(packet->data);
+		Print("Snapshot received. Server time : %d\n Entity count : %d", pkt->snapshot.serverTime ,pkt->snapshot.countEntity);
+		//Client_Unpack_Snapshot(pkt->snapshot);
+		delete pkt;
+	}
+		break;
+
+	default:
+		Print("Cannot handle packet received on chanel %d with packet id %d", chanel, header->cmd);
+		break;
+	}
 }
 
 void Client_Send(const uint8 *source, uint32 length, uint8 channelNo, uint32 flag)
 {
+	if (!connected)
+		return;
+
 	uint8* data = new uint8[length];
 	memcpy(data, source, length);
 
@@ -138,6 +183,7 @@ void Client_Send(const uint8 *source, uint32 length, uint8 channelNo, uint32 fla
 	if (enet_peer_send(peerClient, channelNo, packet) < 0)
 	{
 		delete[] data;
+		delete packet;
 		Print_Error(1, "[NETWORK]Error while sending packet");
 	}
 
