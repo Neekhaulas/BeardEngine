@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <string>
+#include <string.h>
 #include <stdlib.h>
 #include <enet/enet.h>
 #include <map>
@@ -9,6 +10,9 @@
 #include <physfs.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <math.h>
+
+#include <chrono>
 
 #include "shared.h"
 #include "keys.h"

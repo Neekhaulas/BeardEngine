@@ -20,7 +20,7 @@ void Entity_Resolve_Collision(dynamic_entity *ent1, entity *ent2)
 			ent1->velocity.x = 0;
 			ent1->position.x += x;
 		}
-		
+
 		if (y != 0)
 		{
 			ent1->velocity.y = 0;

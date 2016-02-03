@@ -73,7 +73,7 @@ void Game_Start()
 {
 	for (int i = 0; i < Server_Count_Client(); i++)
 	{
-		Server_Get_Client(i)->character = new character(i);
+		Server_Get_Client(i)->c = new character(i);
 	}
 	gameStarted = true;
 }

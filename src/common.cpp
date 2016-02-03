@@ -5,6 +5,7 @@
 #endif
 
 #include <stdarg.h>
+#include <string.h>
 
 void Print(char* format, ...)
 {

@@ -2,7 +2,6 @@
 
 #ifdef SERVER
 #include <vector>
-#include <ctime>
 #include "packets.h"
 
 ENetHost *serverHost = NULL;
@@ -52,7 +51,7 @@ void Server_Make_Snapshot(Client *client, int actualTime)
 	s->serverTime = actualTime;
 	for (int i = 0; i < Game_Get_Entities().size(); i++)
 	{
-		if (Entity_Distance(client->character, Game_Get_Entities().at(i)) <= sv_distance_snapshot->valuef)
+		if (Entity_Distance(client->c, Game_Get_Entities().at(i)) <= sv_distance_snapshot->valuef)
 		{
 			if (s->countEntity < MAX_ENTITIES_IN_SNAPSHOT)
 			{
@@ -61,7 +60,7 @@ void Server_Make_Snapshot(Client *client, int actualTime)
 		}
 	}
 	PacketSnapshot pkt = PacketSnapshot();
-	memcpy(&pkt.snapshot, s, sizeof(snapshot));
+	memcpy(&pkt.s, s, sizeof(snapshot));
 	Server_Send_To(client->peer, reinterpret_cast<uint8*>(&pkt), sizeof(PacketSnapshot), CHL_S2C, ENET_PACKET_FLAG_RELIABLE);
 	Server_Push_Snapshot(client, s);
 	delete s;
@@ -214,7 +213,7 @@ void Server_Frame()
 
 			case ENET_EVENT_TYPE_RECEIVE:
 			{
-				Server_Handle_Packet(event.packet, event.peer, (int)event.peer->data, event.channelID);
+				Server_Handle_Packet(event.packet, event.peer, *((int*)event.peer->data), event.channelID);
 				break;
 			}
 
@@ -222,7 +221,7 @@ void Server_Frame()
 			{
 				Print("Event : disconnect");
 				enet_peer_disconnect(event.peer, 0);
-				clients[(int)event.peer->data] = NULL;
+				clients[*((int*)event.peer->data)] = NULL;
 				break;
 			}
 
@@ -324,7 +323,7 @@ bool Server_Init(int argc, char** argv)
 	*/
 	char* date = __DATE__;
 	char* version_str = (char*)malloc(strlen(PRODUCT_NAME " client 1 (%s)") + 1);
-	
+
 	dedicated = Cvar_Set("dedicated", "1", CVAR_READ_ONLY, "If this is dedicated server");
 
 	developper = Cvar_Set("developer", "1", CVAR_READ_ONLY, "If the developper mod is on");
@@ -355,18 +354,18 @@ bool Server_Init(int argc, char** argv)
 	waitingPlayers = true;
 
 	std::clock_t start = std::clock();
+	std::chrono::time_point<std::chrono::high_resolution_clock> tStart;
+	tStart = std::chrono::high_resolution_clock::now();
 
 	for (;;)
 	{
-		actualTime = std::clock() - start;
+		actualTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - tStart).count();
 		//Console_Frame();
 		Game_Frame(0, 0);
 		Server_Frame();
 		Game_Frame(actualTime, lastTime);
-
 		lastTime = actualTime;
 	}
-		
 	return true;
 }
 
@@ -394,7 +393,6 @@ int main(int argc, char** argv)
 		fatal_error("Error while starting enet");
 	}
 
-	Console_Init();
 	Cvar_Init();
 	Command_Init();
 
